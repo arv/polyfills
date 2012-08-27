@@ -17,9 +17,16 @@
 			var template = document.createElement("template");
 			template.content.appendChild(document.createTextNode("x-element"));
 			//
+			var lifecycle = {
+				created: function(inShadowRoot, inKey) {
+					inShadowRoot.style.color = "white";
+				}
+			};
+			//
 			XElement = document.register("x-element", {
 				prototype: proto,
-				template: template
+				template: template,
+				lifecycle: lifecycle
 			});
 			//
 			var elt = new XElement();
