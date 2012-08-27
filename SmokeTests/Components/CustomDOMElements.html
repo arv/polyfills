@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="../../Components/components-polyfill.js" export="components"></script>
+	</head>
+	<body>
+		<x-element></x-element>	
+		<script>
+			var proto = components.generatePrototype("div", {
+				orangate: function() {
+					this.style.background = "orange";
+				}
+			});
+			//
+			var template = document.createElement("template");
+			template.content.appendChild(document.createTextNode("x-element"));
+			//
+			XElement = document.register("x-element", {
+				prototype: proto,
+				template: template
+			});
+			//
+			var elt = new XElement();
+			document.body.appendChild(elt);
+			//
+			elt.orangate();
+			//
+			elt = document.querySelector("[is=x-element]");
+			elt.orangate();
+		</script>
+	</body>
+</html>
