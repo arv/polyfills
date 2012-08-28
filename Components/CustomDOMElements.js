@@ -8,6 +8,22 @@
 
 scope = scope || {};
 
+// marshall shadow dom implementation
+// TODO(sjmiles): make less phony
+if (!window.shadowDomImpl) {
+  shadowDomImpl = {
+    createShadowDom: function(inInstance, inContents) {
+      inInstance.shadow = inContents;
+      inInstance.appendChild(inInstance.shadow);
+    }
+  };
+}
+
+// custom element definition registry (name: definition)
+
+var registry = {
+};
+
 // SECTION 4
 
 var baseTag = "div";
@@ -25,15 +41,6 @@ var instantiate = function(inPrototype, inTemplate) {
   }
   return element;
 };
-
-if (!window.shadowDomImpl) {
-  shadowDomImpl = {
-    createShadowDom: function(inInstance, inContents) {
-      inInstance.shadow = inContents;
-      inInstance.appendChild(inInstance.shadow);
-    }
-  };
-}
 
 var generateConstructor = function(inPrototype, inTemplate) {
   // 4.b.1. Generate a function object which, when called:
@@ -124,9 +131,6 @@ var validateArguments = function(inName, inOptions) {
     // throw a TypeMismatchError exception.
     throw "7.1.3. TypeMismatchError:  element prototype must inherit from HTMLElement";
   }
-};
-
-var registry = {
 };
 
 var register = function(inName, inOptions) {
