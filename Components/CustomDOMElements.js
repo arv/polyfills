@@ -88,7 +88,7 @@ var upgradeElements = function(inTree, inDefinition) {
   var name = inDefinition.name;
   // 6.b.2 For each element ELEMENT in TREE whose custom element name is NAME:
   var elements = inTree.querySelectorAll(name);
-  for (var i=0; element=elements[i]; i++) {
+  for (var i=0, element; element=elements[i]; i++) {
     // 6.b.2.3. Let UPGRADE be the result of running custom element
     // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
     var upgrade = instantiate(inDefinition.prototype, inDefinition.template);
