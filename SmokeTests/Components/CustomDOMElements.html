@@ -1,41 +1,61 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script src="../../Components/components-polyfill.js" export="components"></script>
-  </head>
-  <body>
-  <x-element></x-element>	
-  <script>
-    var proto = components.CustomDOMElements.generatePrototype("div", {
-      orangate: function() {
-        this.style.background = "orange";
-      }
-    });
-    //
-    var template = document.createElement("template");
-    template.content.appendChild(document.createTextNode("x-element"));
-    //
-    var lifecycle = {
-      created: function(inShadowRoot, inKey) {
-        inShadowRoot.style.color = "white";
-      }
-    };
-    //
-    XElement = document.register("x-element", {
-      prototype: proto,
-      template: template,
-      lifecycle: lifecycle
-    });
-    //
-    var elt = new XElement();
-    document.body.appendChild(elt);
-    //
-    elt.orangate();
-    //
-    elt = document.querySelector("[is=x-element]");
-    elt.orangate();
-  </script>
-</body>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="../../Components/components-polyfill.js" export="components"></script>
+	</head>
+	<body>
+    
+		<x-element></x-element>	
+    
+    <x-subelement></x-subelement>
+    
+    <hr/>
+    
+		<script>
+      //
+      // register
+      //
+			var proto = components.CustomDOMElements.generatePrototype("div", {
+				orangate: function() {
+					this.style.background = "orange";
+				}
+			});
+			//
+			var template = document.createElement("template");
+			template.content.appendChild(document.createTextNode("x-element"));
+			//
+			XElement = document.register("x-element", {
+				prototype: proto,
+				template: template
+			});
+			//
+      // imperative creation
+      //
+			var impElt = new XElement();
+			document.body.appendChild(impElt);
+			impElt.orangate();
+			//
+      // declarative creation
+      //
+			var decElt = document.querySelector("[is=x-element]");
+			decElt.orangate();
+      //
+      // subclass
+      //
+      var proto = components.CustomDOMElements.generatePrototype("x-element", {});
+      //
+			var template = document.createElement("template");
+			template.content.appendChild(document.createTextNode("x-subelement"));
+      //
+			XSubElement = document.register("x-subelement", {
+				prototype: proto,
+				template: template
+			});
+      //
+      var sub = document.querySelector("[is=x-subelement]");
+      sub.orangate();
+		</script>
+	</body>
 </html>
