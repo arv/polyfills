@@ -10,24 +10,24 @@
         logloader: true,
         logparser: true
       };
-    </script>
-    <!-- -->
-    <script src="../../Components/lib/lang.js"></script>
-    <script src="../../Components/ComponentDocuments/path.js"></script>
-    <script src="../../Components/ComponentDocuments/loader.js"></script>
-    <script src="../../Components/ComponentDocuments/parser.js"></script>
-    <!-- -->
-    <link rel="components" href="mock/mock-components.html"/>
-  </head>
-  <body>
-    Output in console.
-    <script>
-      ComponentDocuments.loader.componentLoader.preload(document, function() {
-        console.log("preload finished");
-        ComponentDocuments.parser.parse(document, function(inElement) {
-          console.log(inElement);
-        });
-      });
-    </script>
-  </body>
+		</script>
+		<!-- -->
+		<script src="../../../Components/lib/lang.js"></script>
+		<script src="../../../Components/ComponentDocuments/path.js"></script>
+		<script src="../../../Components/ComponentDocuments/loader.js"></script>
+		<script src="../../../Components/ComponentDocuments/parser.js"></script>
+		<!-- -->
+		<link rel="components" href="mock/mock-components.html"/>
+	</head>
+	<body>
+		Output in console.
+		<script>
+			ComponentDocuments.loader.componentLoader.preload(document, function() {
+				console.log("preload finished");
+				ComponentDocuments.parser.parse(document, function(inElement) {
+					console.log(inElement);
+				});
+			});
+		</script>
+	</body>
 </html>
