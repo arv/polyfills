@@ -66,26 +66,47 @@ var generatePrototype = function(inExtends, inProperties) {
   if (!inExtends) {
     throw "6.1. InvalidCharacterError: extends must be a valid HTML tag name";
   }
-  // 6.a.2. If EXTENDS is a custom element name name, let BASE be the element
-  // prototype of the custom DOM element with the custom element name of EXTENDS
-  /* TODO(sjmiles) */
-
-  // 6.a.3. Otherwise
-  // 6.a.3.1 If BASE is defined in HTML specification or other applicable
-  // specifications, let BASE be the interface prototype object for the element
-  // type corresponding to the HTML tag name of EXTENDS
-  // 6.a.3.2 Otherwise, throw a NotSupportedError exception.
-  /* TODO(sjmiles) */
-
-  // 6.a.3.3 Create a new object that implements BASE
-  // 6.a.3.4 Let PROTOTYPE be this new object
-  var prototype = document.createElement(inExtends);
+  // 6.a.2. If EXTENDS is a custom element name, let BASE be the element
+  // prototype of the custom DOM element with the custom element name EXTENDS
+  if (registry[inExtends]) {
+    var base = registry[inExtends].prototype;
+    // 6.a.3.3 Create a new object that implements BASE
+    // 6.a.3.4 Let PROTOTYPE be this new object 
+    var prototype = Object.create(base);
+  } 
+  else {
+    // TODO(sjmiles): seems like spec is unclear here
+    // I think 6.a.3 means: try to resolve BASE, throw an exception
+    // if you cannot.
+    // It's worded strangely because BASE is tested before it's
+    // defined.
+    // 6.a.3. Otherwise
+    // 6.a.3.1 If BASE is defined in HTML specification or other applicable
+    // specifications, let BASE be the interface prototype object for the element
+    // type corresponding to the HTML tag name of EXTENDS
+    // 6.a.3.2 Otherwise, throw a NotSupportedError exception.
+    /* TODO(sjmiles): validation */
+    // 6.a.3.3 Create a new object that implements BASE
+    // 6.a.3.4 Let PROTOTYPE be this new object 
+    prototype = document.createElement(inExtends);
+  }
   // 6.a.3.5 If PROPERTIES is present and not undefined, define properties on
   // PROTOTYPE using PROPERTIES
+  // 
   // TODO(sjmiles): determine if this is acceptable implementation of 
   // 'define properties'
+  // TODO(sjmiles): handle undefined inProperties
+  // 
+  // strategy: insert 'inProperties' between the element
+  // instance and it's original prototype chain.
+  // 
+  // assumes inProperties has trivial proto (it's clipped off)
+  // 
+  // chain the element's proto to inProperties
   inProperties.__proto__ = prototype.__proto__;
+  // now use inProperties as the elements proto
   prototype.__proto__ = inProperties;
+  // OUTPUT
   return prototype;
 };
 
