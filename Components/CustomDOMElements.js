@@ -100,6 +100,11 @@ var upgradeElements = function(inTree, inDefinition) {
     var upgrade = instantiate(inDefinition.prototype, inDefinition.template);
     // TODO(sjmiles): not in spec
     upgrade.setAttribute("is", inDefinition.name);
+    // TODO(sjmiles): lifecycle not in spec
+    if (inDefinition.lifecycle.created) {
+      // TODO(sjmiles): extract key from ancestor
+      inDefinition.lifecycle.created(upgrade, null);
+    }
     // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
     element.parentNode.replaceChild(upgrade, element);
     // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
@@ -148,11 +153,15 @@ var register = function(inName, inOptions) {
   // object for the HTMLSpanElement interface
   var prototype = inOptions.prototype || HTMLSpanElement.prototype;
   var template = inOptions.template;
+  // TODO(sjmiles): lifecycle not in spec
+  var lifecycle = inOptions.lifecycle || {};
   // 7.1.4 Let DEFINITION be the tuple of (PROTOTYPE, TEMPLATE, NAME)
   var definition = {
     prototype: prototype,
     template: template,
-    name: inName
+    name: inName,
+    // TODO(sjmiles): lifecycle not in spec
+    lifecycle: lifecycle
   };
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registry[inName] = definition;
