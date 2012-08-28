@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script src="../lang.js"></script>
+	</head>
+	<body>
+		<template>
+			Shadow Content
+			<content></content>
+		</template>
+		<!-- -->
+		<div style="border: 1px solid orange; padding: 8px;">I am one div</div>
+		<!-- -->
+		<button onclick="lightMorph()">Morph LightDom</button>
+		<button onclick="shadowMorph()">Morph ShadowDom</button>
+		<script>
+			var observe = function(inInstance, inMethod) {
+				var contentChanges = function() {
+					inMethod.call(inInstance);
+				};
+				var observer = new WebKitMutationObserver(contentChanges);
+				observer.observe(inInstance, {
+					characterData: true,
+					childList: true,
+					subtree: true
+				});
+			};
+			//
+			var isTemplate = function(inNode) {
+				return (inNode.tagName == "TEMPLATE");
+			};
+			//
+			CustomShadowRoot = function(inElement) {
+				inElement.lightDom = inElement.cloneNode(true);
+				inElement.shadowDom = document.createDocumentFragment();
+				inElement.render = function() {
+					var dom = CustomShadowRoot.prototype.project(inElement);
+					inElement.textContent = "";
+					inElement.appendChild(dom);
+				}
+				observe(inElement.lightDom, inElement.render);
+				observe(inElement.shadowDom, inElement.render);
+				//inElement.render();
+				return inElement.shadowDom;
+			};
+			CustomShadowRoot.prototype = {
+				project: function(inElement) {
+					// we are going to move nodes from src into dom, so we need a mutable copy
+					var src = inElement.lightDom.cloneNode(true);
+					// we are going to replace <content> nodes with nodes form source, so we need a mutable copy
+					var dom = inElement.shadowDom.cloneNode(true);
+					// FIXME: don't know how to to this
+					//this.renderShadows();
+					// construct an immutable list of content nodes
+					var c$ = [];
+					$$(dom, "content").forEach(function(content) {
+						c$.push(content)
+					});
+					// replace each <content> element in dom with matching content from src
+					c$.forEach(function(content) {
+						// build a fragment to contain selected nodes
+						var frag = document.createDocumentFragment();
+						// find selected 'light dom' nodes
+						var slctr = content.getAttribute("select");
+						var nodes = slctr ? $$(src, slctr) : src.childNodes;
+						for (var i=0, n; (n=nodes[i]);) {
+							if (isTemplate(n) || (n.parentNode != src)) {
+								i++;
+							} else {
+								frag.appendChild(n);
+							}
+						}
+						// replace the content node with the fragment
+						content.parentNode.replaceChild(frag, content);
+					});
+					return dom;
+				},
+				renderShadows: function(inElement) {
+					// ????
+				}
+			};
+			//
+			var div = document.querySelector("div");
+			var shadowRoot = new CustomShadowRoot(div);
+			var template = document.querySelector("template");
+			shadowRoot.appendChild(template.content);
+			//div.render();
+			//
+			lightMorph = function() {
+				div.lightDom.appendChild(document.createTextNode("Marph"));
+			};
+			shadowMorph = function() {
+				div.shadowDom.appendChild(document.createTextNode("hpraM"));
+			};
+		</script>
+	</body>
+</html>
