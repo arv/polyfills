@@ -9,6 +9,8 @@
     
 		<x-element></x-element>	
     
+    <hr/>
+    
     <x-subelement></x-subelement>
     
     <hr/>
@@ -28,7 +30,13 @@
 			//
 			XElement = document.register("x-element", {
 				prototype: proto,
-				template: template
+				template: template,
+        lifecycle: {
+          created: function(inShadowRoot, inKey) {
+            console.log("x-element created", this.is, inShadowRoot, inKey);
+          },
+          key: 42
+        }
 			});
 			//
       // imperative creation
@@ -51,7 +59,12 @@
       //
 			XSubElement = document.register("x-subelement", {
 				prototype: proto,
-				template: template
+				template: template,
+        lifecycle: {
+          created: function(inShadowRoot, inKey) {
+            console.log("x-subelement created", this.is, inShadowRoot, inKey);
+          }
+        }
 			});
       //
       var sub = document.querySelector("[is=x-subelement]");

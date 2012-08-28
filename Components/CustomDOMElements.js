@@ -9,6 +9,7 @@ if (!window.shadowDomImpl) {
     createShadowDom: function(inInstance, inContents) {
       inInstance.shadow = inContents;
       inInstance.appendChild(inInstance.shadow);
+      return inContents;
     }
   };
 }
@@ -22,28 +23,61 @@ var registry = {
 
 var baseTag = "div";
 
-var instantiate = function(inPrototype, inTemplate) {
+var instantiate = function(inPrototype, inTemplate, inLifecycle) {
   // 4.a.1. Create a new object that implements PROTOTYPE
   // 4.a.2. Let ELEMENT by this new object
   var element = document.createElement(baseTag);
   element.__proto__ = inPrototype;
+  // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
+  // spec implementation
+  /*
   // 4.a.3. if template was provided
   if (inTemplate) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
+    // allow polymorphic shadowDomImpl
     shadowDomImpl.createShadowDom(element, inTemplate.content.cloneNode(true));
   }
+  */
+  // custom implementation
+  // TODO(sjmiles): 'extendsName' property is non-spec
+  instantiateShadowDom(element, element.extendsName, inTemplate, inLifecycle);
   return element;
 };
 
-var generateConstructor = function(inPrototype, inTemplate) {
+var instantiateShadowDom = function(inElement, inExtendsName, inTemplate, 
+  inLifecycle) {
+  // generate shadow DOM recursively
+  // TODO(sjmiles): do we ever need shadowDOM when there is no template?
+  // can we create a <shadow> dynamically?
+  if (inTemplate) {
+    var ancestor = registry[inExtendsName];
+    if (ancestor) {
+      // recurse
+      // TODO(sjmiles): 'extendsName' property is non-spec
+      instantiateShadowDom(inElement, ancestor.prototype.extendsName, 
+        ancestor.template, ancestor.lifecycle);
+    }
+    // 4.a.3.2. clone template as contents of this shadow root
+    var contents = inTemplate.content.cloneNode(true);
+    // generate shadow DOM
+    var shadow = shadowDomImpl.createShadowDom(inElement, contents);
+    // call created lifecycle method (per each chained element)
+    var created = inLifecycle.created;
+    if (created) {
+      created.call(inElement, shadow, ancestor && ancestor.lifecycle.key);
+    }
+  }
+};
+
+var generateConstructor = function(inPrototype, inTemplate, inLifecycle) {
   // 4.b.1. Generate a function object which, when called:
   // 4.b.1.1. Runs the custom element instantiation algorithm with PROTOTYPE
   // and TEMPLATE as arguments.
   // 4.b.1.2. Returns algorithm's output as result
   // 4.b.2. Let CONSTRUCTOR be that function object
   var constructor = function() {
-    return instantiate(inPrototype, inTemplate);
+    return instantiate(inPrototype, inTemplate, inLifecycle);
   };
   // 4.b.3. Set PROTOTYPE as the prototype property on CONSTRUCTOR
   constructor.prototype = inPrototype;
@@ -90,6 +124,10 @@ var generatePrototype = function(inExtends, inProperties) {
   // TODO(sjmiles): determine if this is acceptable implementation of 
   // 'define properties'
   // TODO(sjmiles): handle undefined inProperties
+  // TODO(sjmiles): we need to store our extends name somewhere
+  // so we can look up ancestor properties during initialization
+  var properties = inProperties || {};
+  properties.extendsName = inExtends;
   // 
   // strategy: insert 'inProperties' between the element
   // instance and it's original prototype chain.
@@ -97,9 +135,9 @@ var generatePrototype = function(inExtends, inProperties) {
   // assumes inProperties has trivial proto (it's clipped off)
   // 
   // chain the element's proto to inProperties
-  inProperties.__proto__ = prototype.__proto__;
+  properties.__proto__ = prototype.__proto__;
   // now use inProperties as the elements proto
-  prototype.__proto__ = inProperties;
+  prototype.__proto__ = properties;
   // OUTPUT
   return prototype;
 };
@@ -112,14 +150,20 @@ var upgradeElements = function(inTree, inDefinition) {
   for (var i=0, element; element=elements[i]; i++) {
     // 6.b.2.3. Let UPGRADE be the result of running custom element
     // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
-    var upgrade = instantiate(inDefinition.prototype, inDefinition.template);
+    var upgrade = instantiate(inDefinition.prototype, inDefinition.template,
+      inDefinition.lifecycle);
     // TODO(sjmiles): not in spec
     upgrade.setAttribute("is", inDefinition.name);
+    /*
     // TODO(sjmiles): lifecycle not in spec
     if (inDefinition.lifecycle.created) {
-      // TODO(sjmiles): extract key from ancestor
-      inDefinition.lifecycle.created(upgrade, null);
+      // TODO(sjmiles): inDefinition.prototype.extendsName not in spec,
+      // see above
+      var ancestor = registry[inDefinition.prototype.extendsName];
+      inDefinition.lifecycle.created(upgrade, 
+        ancestor && ancestor.lifecycle.key);
     }
+    */
     // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
     element.parentNode.replaceChild(upgrade, element);
     // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
@@ -128,9 +172,10 @@ var upgradeElements = function(inTree, inDefinition) {
   }
 };
 
-// SECTION 5 deals with UA parsing HTML
-//
-// TODO(sjmiles): do we need to polyfill something here?
+// SECTION 5
+
+// TODO(sjmiles): deals with UA parsing HTML; do we need to polyfill 
+// something here?
 
 // SECTION 7.1
 
@@ -167,13 +212,14 @@ var register = function(inName, inOptions) {
   // 7.1.2 If PROTOTYPE is missing, let PROTOTYPE be the interface prototype
   // object for the HTMLSpanElement interface
   var prototype = inOptions.prototype || HTMLSpanElement.prototype;
-  var template = inOptions.template;
+  // TODO(sjmiles): putting name on prototype not in spec
+  prototype.is = inName;
   // TODO(sjmiles): lifecycle not in spec
   var lifecycle = inOptions.lifecycle || {};
   // 7.1.4 Let DEFINITION be the tuple of (PROTOTYPE, TEMPLATE, NAME)
   var definition = {
     prototype: prototype,
-    template: template,
+    template: inOptions.template,
     name: inName,
     // TODO(sjmiles): lifecycle not in spec
     lifecycle: lifecycle
@@ -191,7 +237,7 @@ var register = function(inName, inOptions) {
   // and TEMPLATE as arguments
   // 7.1.8. Return the output of the previous step.
   // 7. Output: CONSTRUCTOR, the custom element constructor
-  return generateConstructor(prototype, template);
+  return generateConstructor(prototype, template, lifecycle);
 };
 
 // SECTION 7.2
