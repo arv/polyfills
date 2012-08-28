@@ -152,9 +152,17 @@ HTMLElementElement = function(inElement) {
 
 // exports
 
-scope.generatePrototype = generatePrototype;
-scope.register = register;
-scope.HTMLElementElement = HTMLElementElement;
+var exports = {
+  instantiate: instantiate,
+  generateConstructor: generateConstructor,
+  generatePrototype: generatePrototype,
+  upgradeElements: upgradeElements,
+  validateArguments: validateArguments,
+  register: register,
+  HTMLElementElement: HTMLElementElement
+};
+
+scope.CustomDOMElements = exports;
 
 // new public API
 
