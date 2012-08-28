@@ -5,7 +5,7 @@
   scope = scope || {};
   scope.flags = scope.flags || {};
 
-  var log = scope.flags.logparse;
+  var log = scope.flags.logparser;
   
   // imports
   

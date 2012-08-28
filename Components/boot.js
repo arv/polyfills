@@ -33,7 +33,7 @@ if (!scope.flags.runManually) {
 
 // we are using this object for cross-module support only
 // use 'export' directive to get a global reference
-// (see components-polyfill.js")
+// (see components-polyfill.js)
 
 window.__exported_components_polyfill_scope__ = null;
 
