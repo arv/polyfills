@@ -7,6 +7,7 @@ scope = scope || {};
 var shadowDomImpl = scope.shadowDomImpl;
 
 // custom element definition registry (name: definition)
+// TODO(sjmiles): coordinate with spec
 
 var registry = {
 };
