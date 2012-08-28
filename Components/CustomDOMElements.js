@@ -160,7 +160,7 @@ var register = function(inName, inOptions) {
   // DOCUMENT tree:
   /* TODO(sjmiles): and every shadow DOM subtree */
   // 7.1.6.1. Let TREE be this tree
-  // 7/1.6.2. Run element upgrade algorithm with TREE and DEFINITION as
+  // 7.1.6.2. Run element upgrade algorithm with TREE and DEFINITION as
   // arguments
   upgradeElements(document, definition);
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
