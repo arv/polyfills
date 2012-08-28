@@ -44,6 +44,10 @@ var require = function(inSrc) {
 };
 
 [
+  "lib/lang.js",
+  "ComponentDocuments/path.js",
+  "ComponentDocuments/loader.js",
+  "ComponentDocuments/parser.js",
 	"CustomDOMElements.js",
 	"boot.js"
 ].forEach(require);
