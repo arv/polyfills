@@ -1,3 +1,9 @@
+/*
+ * Copyright 2012 The Toolkitchen Authors. All rights reserved.
+ * Use of this source code is goverened by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
 function nop() {};
 
 var nob = {};
@@ -25,7 +31,8 @@ var $$ = function(inElement, inSelector) {
 };
 
 var createDom = function(inTagOrNode, inHtml, inAttrs) {
-  var dom = (typeof inTagOrNode == "string") ? document.createElement(inTagOrNode) : inTagOrNode.cloneNode(true);
+  var dom = (typeof inTagOrNode == "string") ? 
+    document.createElement(inTagOrNode) : inTagOrNode.cloneNode(true);
   dom.innerHTML = inHtml;
   if (inAttrs) {
     for (var n in inAttrs) {

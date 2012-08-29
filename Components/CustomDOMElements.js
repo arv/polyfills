@@ -1,3 +1,9 @@
+/*
+ * Copyright 2012 The Toolkitchen Authors. All rights reserved.
+ * Use of this source code is goverened by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
 (function(scope) {
 
 scope = scope || {};
@@ -89,9 +95,9 @@ var upgradeElements = function(inTree, inDefinition) {
     upgrade.setAttribute("is", inDefinition.name);
     // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
     element.parentNode.replaceChild(upgrade, element);
-  // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
-  // attribute set to true.
-  /* TODO(sjmiles) */
+    // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
+    // attribute set to true.
+    /* TODO(sjmiles) */
   }
 };
 

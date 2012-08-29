@@ -1,3 +1,9 @@
+/*
+ * Copyright 2012 The Toolkitchen Authors. All rights reserved.
+ * Use of this source code is goverened by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+
 (function(scope) {
 
 scope = scope || {};
@@ -45,12 +51,12 @@ var require = function(inSrc) {
 };
 
 [
-"lib/lang.js",
-"ComponentDocuments/path.js",
-"ComponentDocuments/loader.js",
-"ComponentDocuments/parser.js",
-"CustomDOMElements.js",
-"boot.js"
+  "lib/lang.js",
+  "ComponentDocuments/path.js",
+  "ComponentDocuments/loader.js",
+  "ComponentDocuments/parser.js",
+  "CustomDOMElements.js",
+  "boot.js"
 ].forEach(require);
 
 })(window.__exported_components_polyfill_scope__);
