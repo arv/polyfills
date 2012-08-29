@@ -3,7 +3,7 @@
 <head>
   <title></title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <script src="../../Components/components-polyfill.js" export="components" shimShadow></script>
+  <script src="../../Components/components-polyfill.js" export="components" xshimShadow></script>
   <style>
     shadow-root {
       color: silver !important;
@@ -22,7 +22,11 @@
 
   <hr/>
 
-<!--  <x-subelement></x-subelement>-->
+  <template id="x-subelement">
+    x-subelement
+    <shadow>
+  </template>
+  <x-subelement></x-subelement>
 
   <hr/>
 
@@ -42,8 +46,7 @@
       lifecycle: {
         created: function(inShadowRoot, inKey) {
           console.log("x-element created", this.is, inShadowRoot, inKey);
-        },
-        key: 42
+        }
       }
     });
     //
@@ -69,12 +72,9 @@
     var subclass = function() {
       var proto = components.CustomDOMElements.generatePrototype("x-element", {});
       //
-      var template = document.createElement("template");
-      template.content.appendChild(document.createTextNode("x-subelement"));
-      //
       XSubElement = document.register("x-subelement", {
         prototype: proto,
-        template: template,
+        template: document.querySelector("template#x-subelement"),
         lifecycle: {
           created: function(inShadowRoot, inKey) {
             console.log("x-subelement created", this.is, inShadowRoot, inKey);
@@ -85,8 +85,7 @@
       var sub = document.querySelector("[is=x-subelement]");
       sub.orangate();
     };
-    //subclass();
-    //
+    subclass();
   </script>
 </body>
 </html>
