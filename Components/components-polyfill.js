@@ -5,6 +5,7 @@ scope = scope || {};
 // NOTE: use attributes on the script tag for this file as directives
 
 // export="[name]"		exports polyfill scope into window as 'name'
+// shimShadow         use shim version of ShadowDom (otherwise native)
 
 // NOTE: uses 'window' and 'document' globals
 
@@ -29,7 +30,8 @@ var source, base = "";
 })();
 
 var flags = scope.flags = {
-  exportAs: source.getAttribute("export")
+  exportAs: source.getAttribute("export"),
+  shimShadow: source.hasAttribute("shimshadow")
 };
 
 console.log(flags);
@@ -45,12 +47,15 @@ var require = function(inSrc) {
 };
 
 [
-"lib/lang.js",
-"ComponentDocuments/path.js",
-"ComponentDocuments/loader.js",
-"ComponentDocuments/parser.js",
-"CustomDOMElements.js",
-"boot.js"
+  "lib/lang.js",
+  "ShadowDom/WebkitShadowDom.js",
+  "ShadowDom/ShimShadowDom.js",
+  "ShadowDom/ShadowDom.js",
+  "ComponentDocuments/path.js",
+  "ComponentDocuments/loader.js",
+  "ComponentDocuments/parser.js",
+  "CustomDOMElements.js",
+  "boot.js"
 ].forEach(require);
 
 })(window.__exported_components_polyfill_scope__);
