@@ -8,17 +8,9 @@
 
 scope = scope || {};
 
-// marshall shadow dom implementation
-// TODO(sjmiles): make less phony
-if (!window.shadowDomImpl) {
-  shadowDomImpl = {
-    createShadowDom: function(inInstance, inContents) {
-      inInstance.shadow = inContents;
-      inInstance.appendChild(inInstance.shadow);
-      return inContents;
-    }
-  };
-}
+// imports
+
+var shadowDomImpl = scope.shadowDomImpl;
 
 // custom element definition registry (name: definition)
 
@@ -34,7 +26,9 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
   // 4.a.2. Let ELEMENT by this new object
   var element = document.createElement(baseTag);
   element.__proto__ = inPrototype;
+  //
   // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
+  //
   // spec implementation
   /*
   // 4.a.3. if template was provided
@@ -45,13 +39,16 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
     shadowDomImpl.createShadowDom(element, inTemplate.content.cloneNode(true));
   }
   */
+  //
   // custom implementation
+  //
   // TODO(sjmiles): 'extendsName' property is non-spec
   instantiateShadowDom(element, element.extendsName, inTemplate, inLifecycle);
+  // OUTPUT
   return element;
 };
 
-var instantiateShadowDom = function(inElement, inExtendsName, inTemplate, 
+var instantiateShadowDom = function(inElement, inExtendsName, inTemplate,
   inLifecycle) {
   // generate shadow DOM recursively
   // TODO(sjmiles): do we ever need shadowDOM when there is no template?
@@ -61,7 +58,7 @@ var instantiateShadowDom = function(inElement, inExtendsName, inTemplate,
     if (ancestor) {
       // recurse
       // TODO(sjmiles): 'extendsName' property is non-spec
-      instantiateShadowDom(inElement, ancestor.prototype.extendsName, 
+      instantiateShadowDom(inElement, ancestor.prototype.extendsName,
         ancestor.template, ancestor.lifecycle);
     }
     // 4.a.3.2. clone template as contents of this shadow root
@@ -73,6 +70,8 @@ var instantiateShadowDom = function(inElement, inExtendsName, inTemplate,
     if (created) {
       created.call(inElement, shadow, ancestor && ancestor.lifecycle.key);
     }
+    // tickle non-native shadow impls
+    shadowDomImpl.installDom(inElement);
   }
 };
 
@@ -105,9 +104,9 @@ var generatePrototype = function(inExtends, inProperties) {
   if (registry[inExtends]) {
     var base = registry[inExtends].prototype;
     // 6.a.3.3 Create a new object that implements BASE
-    // 6.a.3.4 Let PROTOTYPE be this new object 
+    // 6.a.3.4 Let PROTOTYPE be this new object
     var prototype = Object.create(base);
-  } 
+  }
   else {
     // TODO(sjmiles): seems like spec is unclear here
     // I think 6.a.3 means: try to resolve BASE, throw an exception
@@ -121,25 +120,28 @@ var generatePrototype = function(inExtends, inProperties) {
     // 6.a.3.2 Otherwise, throw a NotSupportedError exception.
     /* TODO(sjmiles): validation */
     // 6.a.3.3 Create a new object that implements BASE
-    // 6.a.3.4 Let PROTOTYPE be this new object 
+    // 6.a.3.4 Let PROTOTYPE be this new object
     prototype = document.createElement(inExtends);
   }
   // 6.a.3.5 If PROPERTIES is present and not undefined, define properties on
   // PROTOTYPE using PROPERTIES
-  // 
-  // TODO(sjmiles): determine if this is acceptable implementation of 
-  // 'define properties'
+  //
+  // TODO(sjmiles): this is improper implementation of 'define properties'
+  // the spec means Object.defineProperties
+  //
   // TODO(sjmiles): handle undefined inProperties
-  // TODO(sjmiles): we need to store our extends name somewhere
-  // so we can look up ancestor properties during initialization
   var properties = inProperties || {};
+  //
+  // TODO(sjmiles): OFF SPEC: we need to store our extends name somewhere
+  // so we can look up ancestor properties during initialization
+  //
   properties.extendsName = inExtends;
-  // 
+  //
   // strategy: insert 'inProperties' between the element
   // instance and it's original prototype chain.
-  // 
+  //
   // assumes inProperties has trivial proto (it's clipped off)
-  // 
+  //
   // chain the element's proto to inProperties
   properties.__proto__ = prototype.__proto__;
   // now use inProperties as the elements proto
@@ -158,7 +160,9 @@ var upgradeElements = function(inTree, inDefinition) {
     // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
     var upgrade = instantiate(inDefinition.prototype, inDefinition.template,
       inDefinition.lifecycle);
+    //
     // TODO(sjmiles): not in spec
+    //
     upgrade.setAttribute("is", inDefinition.name);
     /*
     // TODO(sjmiles): lifecycle not in spec
@@ -166,7 +170,7 @@ var upgradeElements = function(inTree, inDefinition) {
       // TODO(sjmiles): inDefinition.prototype.extendsName not in spec,
       // see above
       var ancestor = registry[inDefinition.prototype.extendsName];
-      inDefinition.lifecycle.created(upgrade, 
+      inDefinition.lifecycle.created(upgrade,
         ancestor && ancestor.lifecycle.key);
     }
     */
@@ -180,7 +184,7 @@ var upgradeElements = function(inTree, inDefinition) {
 
 // SECTION 5
 
-// TODO(sjmiles): deals with UA parsing HTML; do we need to polyfill 
+// TODO(sjmiles): deals with UA parsing HTML; do we need to polyfill
 // something here?
 
 // SECTION 7.1
@@ -215,6 +219,7 @@ var register = function(inName, inOptions) {
   // TODO(sjmiles): resolve discrepancy between input and the formal arguments
   //
   validateArguments(inName, inOptions);
+  var template = inOptions.template;
   // 7.1.2 If PROTOTYPE is missing, let PROTOTYPE be the interface prototype
   // object for the HTMLSpanElement interface
   var prototype = inOptions.prototype || HTMLSpanElement.prototype;
@@ -225,7 +230,7 @@ var register = function(inName, inOptions) {
   // 7.1.4 Let DEFINITION be the tuple of (PROTOTYPE, TEMPLATE, NAME)
   var definition = {
     prototype: prototype,
-    template: inOptions.template,
+    template: template,
     name: inName,
     // TODO(sjmiles): lifecycle not in spec
     lifecycle: lifecycle
