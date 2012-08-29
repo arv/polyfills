@@ -13,67 +13,55 @@ scope = scope || {};
 var shadowDomImpl = scope.shadowDomImpl;
 
 // custom element definition registry (name: definition)
-// TODO(sjmiles): coordinate with spec
+// TODO(sjmiles): coordinate with spec, I suppose this just a implementation
+// detail?
 
 var registry = {
 };
 
 // SECTION 4
 
-var baseTag = "div";
-
 var instantiate = function(inPrototype, inTemplate, inLifecycle) {
   // 4.a.1. Create a new object that implements PROTOTYPE
   // 4.a.2. Let ELEMENT by this new object
-  var element = document.createElement(baseTag);
+  //
+  // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
+  // our solution is to call extendee constructor, if it's generated
+  // and create a base element if not.
+  // 
+  // This is tricky to reconcile with spec, since the concepts
+  // of base element and prototype swizzling are polyfil
+  // concerns.
+  //
+  // search for an extendee constructor
+  var p = inPrototype;
+  while (p && (p.constructor === inPrototype.constructor)) {
+    p = p.__proto__;
+  }
+  // we have attached a flag to identify a generated constructor
+  var element = p.constructor.generated ? p.constructor() 
+    // TODO(sjmiles): ad hoc usage of "div"
+    : document.createElement("div");
+  // implement inPrototype
   element.__proto__ = inPrototype;
   //
   // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
   //
   // spec implementation
-  /*
   // 4.a.3. if template was provided
   if (inTemplate) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
     // allow polymorphic shadowDomImpl
-    shadowDomImpl.createShadowDom(element, inTemplate.content.cloneNode(true));
+    var shadow = shadowDomImpl.createShadowDom(element, inTemplate.content.cloneNode(true));
   }
-  */
-  //
-  // custom implementation
-  //
-  // TODO(sjmiles): 'extendsName' property is non-spec
-  instantiateShadowDom(element, element.extendsName, inTemplate, inLifecycle);
+  // TODO(sjmiles): OFF SPEC: support lifecycle
+  var created = inLifecycle.hasOwnProperty("created") && inLifecycle.created;
+  if (created) {
+      created.call(element, shadow);
+  }
   // OUTPUT
   return element;
-};
-
-var instantiateShadowDom = function(inElement, inExtendsName, inTemplate,
-  inLifecycle) {
-  // generate shadow DOM recursively
-  // TODO(sjmiles): do we ever need shadowDOM when there is no template?
-  // can we create a <shadow> dynamically?
-  if (inTemplate) {
-    var ancestor = registry[inExtendsName];
-    if (ancestor) {
-      // recurse
-      // TODO(sjmiles): 'extendsName' property is non-spec
-      instantiateShadowDom(inElement, ancestor.prototype.extendsName,
-        ancestor.template, ancestor.lifecycle);
-    }
-    // 4.a.3.2. clone template as contents of this shadow root
-    var contents = inTemplate.content.cloneNode(true);
-    // generate shadow DOM
-    var shadow = shadowDomImpl.createShadowDom(inElement, contents);
-    // call created lifecycle method (per each chained element)
-    var created = inLifecycle.created;
-    if (created) {
-      created.call(inElement, shadow, ancestor && ancestor.lifecycle.key);
-    }
-    // tickle non-native shadow impls
-    shadowDomImpl.installDom(inElement);
-  }
 };
 
 var generateConstructor = function(inPrototype, inTemplate, inLifecycle) {
@@ -85,6 +73,9 @@ var generateConstructor = function(inPrototype, inTemplate, inLifecycle) {
   var constructor = function() {
     return instantiate(inPrototype, inTemplate, inLifecycle);
   };
+  // TODO(sjmiles): OFF SPEC: flag this constructor so we can identify it 
+  // in instantiate above
+  constructor.generated = true;
   // 4.b.3. Set PROTOTYPE as the prototype property on CONSTRUCTOR
   constructor.prototype = inPrototype;
   // 4.b.3. Set CONSTRUCTOR as the constructor property on PROTOTYPE.
@@ -233,23 +224,44 @@ var register = function(inName, inOptions) {
     prototype: prototype,
     template: template,
     name: inName,
-    // TODO(sjmiles): lifecycle not in spec
+    // TODO(sjmiles): OFF SPEC: lifecycle not in spec
     lifecycle: lifecycle
   };
+  // 
+  // TODO(sjmiles): OFF SPEC: get tricky with lifecycle
+  var ancestor = registry[prototype.extendsName];
+  if (ancestor) {
+    lifecycle.__proto__ = ancestor.lifecycle;
+  }
+  // 
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registry[inName] = definition;
-  // 7.1.6: For DOCUMENT tree and every shadow DOM subtree enclosed by
-  // DOCUMENT tree:
-  /* TODO(sjmiles): and every shadow DOM subtree */
-  // 7.1.6.1. Let TREE be this tree
-  // 7.1.6.2. Run element upgrade algorithm with TREE and DEFINITION as
-  // arguments
-  upgradeElements(document, definition);
+  //
+  // TODO(sjmiles): OFFSPEC: re-ordering the flow
+  // so that prototype has the correct constructor on it
+  // at instantiate time (when we call upgradeElements)
+  // 
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
   // and TEMPLATE as arguments
   // 7.1.8. Return the output of the previous step.
   // 7. Output: CONSTRUCTOR, the custom element constructor
-  return generateConstructor(prototype, template, lifecycle);
+  var ctor = generateConstructor(prototype, template, lifecycle);
+  // TODO(sjmiles): OFF SPEC: for deubgging only
+  ctor.tag = inName;
+  //
+  // 7.1.6: For DOCUMENT tree and every shadow DOM subtree enclosed by
+  // DOCUMENT tree:
+  //
+  // TODO(sjmiles): "and every shadow DOM subtree" may not be possible
+  // from polyfill. We will ensure this happens for shadow subtrees
+  // created by this polyfill, but any others are invisible.
+  // 
+  // 7.1.6.1. Let TREE be this tree
+  // 7.1.6.2. Run element upgrade algorithm with TREE and DEFINITION as
+  // arguments
+  //
+  upgradeElements(document, definition);
+  return ctor;
 };
 
 // SECTION 7.2
