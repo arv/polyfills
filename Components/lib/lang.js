@@ -6,33 +6,41 @@
 
 function nop() {};
 
-var nob = {};
+// Old versions of iOS does not have bind.
+if (!Function.prototype.bind) {
+  console.warn('Patching Function.prototype.bind');
+  Function.prototype.bind = function(scope) {
+    var self = this;
+    var args = Array.prototype.slice.call(arguments, 1);
+    return function() {
+      var args2 = args.slice();
+      args2.push.apply(args2, arguments);
+      return self.apply(scope, args2);
+    };
+  };
+}
 
 // missing DOM/JS API
 
-var forEach = function(inArrayish, inFunc, inScope) {
-  Array.prototype.forEach.call(inArrayish, inFunc, inScope);
-};
+var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach.call);
 
-var $ = function(inElement, inSelector) {
+function $(inElement, inSelector) {
   if (arguments.length == 1) {
     inSelector = inElement;
     inElement = document;
   }
   return inElement.querySelector(inSelector);
-};
+}
 
-var $$ = function(inElement, inSelector) {
+function $$(inElement, inSelector) {
   var nodes = inElement.querySelectorAll(inSelector);
-  nodes.forEach = function(inFunc, inScope) {
-    forEach(nodes, inFunc, inScope);
-  }
+  nodes.forEach = Array.prototype.forEach;
   return nodes;
-};
+}
 
-var createDom = function(inTagOrNode, inHtml, inAttrs) {
-  var dom = (typeof inTagOrNode == "string") ? 
-    document.createElement(inTagOrNode) : inTagOrNode.cloneNode(true);
+function createDom(inTagOrNode, inHtml, inAttrs) {
+  var dom = typeof inTagOrNode == 'string' ?
+      document.createElement(inTagOrNode) : inTagOrNode.cloneNode(true);
   dom.innerHTML = inHtml;
   if (inAttrs) {
     for (var n in inAttrs) {
@@ -40,16 +48,4 @@ var createDom = function(inTagOrNode, inHtml, inAttrs) {
     }
   }
   return dom;
-};
-
-// bind shim for iOs
-
-if (!Function.prototype.bind) {
-  console.warn("patching 'bind'");
-  Function.prototype.bind = function(scope) {
-    var _this = this;
-    return function() {
-      return _this.apply(scope, arguments);
-    }
-  }
-};
+}
