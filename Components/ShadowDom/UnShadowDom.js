@@ -4,16 +4,12 @@ scope = scope || {};
 
 var shimShadow = {
   createShadowDom: function(inInstance, inContents) {
-    // find my definition
     // create shadow dom from template
     inInstance.shadowDom = document.createElement("shadow-root");
     inInstance.shadowDom.content = inContents;
     inInstance.shadowDom.appendChild(inContents.cloneNode(true));
-    //inInstance.shadow = inContents;
-    // the real dom is the render tree, we have to simulate lightDom
-    shimShadow.createLightDom(inInstance);
     // for debug/visualization purposes
-    inInstance.appendChild(inInstance.shadowDom);
+    //inInstance.appendChild(inInstance.shadowDom);
     // return shadow root
     return inInstance.shadowDom;
   },
@@ -41,7 +37,7 @@ var shimShadow = {
         var repl = n.cloneNode(true);
         repl.replaces = n;
         n.replaced = repl;
-        n.parentNode.insertBefore(n, repl);
+        source.insertBefore(n, repl);
     };
     // target for installation
     var target = inInstance;
@@ -70,7 +66,7 @@ var shimShadow = {
           if ((n.parentNode != source) || isTemplate(n) || isShadowRoot(n)) {
             i++;
           } else {
-            //repl(n);
+            repl(n);
             frag.appendChild(n);
           }
         }

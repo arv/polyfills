@@ -27,7 +27,8 @@ var inject = function(inScript, inContext, inName) {
   context = inContext;
   // inject a (debuggable!) script tag
   var	tag = document.createElement("script");
-  tag.textContent = "componentScript('" + inName + "', function(){" + inScript + "});";
+  tag.textContent = "componentScript('" + inName + "', function(){"
+    + inScript + "});";
   document.body.appendChild(tag);
 };
 
@@ -58,7 +59,7 @@ HTMLElementElement.prototype = {
     this.lifecycleImpl = inLifecycle;
   },
   instantiate: function() {
-    return CustomDomElements.instantiate(this.prototype, this.template, 
+    return CustomDomElements.instantiate(this.prototype, this.template,
       this.lifecycleImpl);
   },
   register: function(element) {
@@ -70,22 +71,22 @@ HTMLElementElement.prototype = {
     elementParser.applyHostStyles(this.template, this.name);
     //
     // to register a custom element, I need
-    // 
+    //
     //  prototype
     //  lifcycle
     //  template
-    //  
+    //
     // I have template right away
-    // 
+    //
     // I don't get lifecycle or prototype until
     // executing user's code
-    // 
+    //
     // so, execute user's code right away
-    // 
+    //
     // but user may want to cache the reference to generatedConstructor
-    // so I have to make a 'real one', but I cannot use the canonical 
+    // so I have to make a 'real one', but I cannot use the canonical
     // constructor-generation algorithm because I am missing pieces
-    // 
+    //
     // Gambit: make a custom generatedConstructor that binds
     // to an object that is filled in later (instead of
     // a closure)
@@ -101,11 +102,13 @@ HTMLElementElement.prototype = {
     //
     // we need to reprocess the prototype (cheating because
     // prototype is not a property defintion object as called for
-    // by the spec; it happens to work now due CustomDomElements is 
+    // by the spec; it happens to work now due CustomDomElements is
     // implemented to take a regular map)
     //
     this.prototype = CustomDOMElements.generatePrototype(this.extendsName,
       this.generatedConstructor.prototype);
+    // TODO(sjmiles): putting name on prototype not in spec
+    this.prototype.is = this.name;
     //
     // can't use canonical register method because we've already
     // generated a constructor
@@ -181,13 +184,14 @@ elementParser = {
   },
   hostRe:/(@host[^{]*)({[^{]*})/gim,
   applyHostStyles: function(template, name) {
-    // strategy: apply a rule for each @host rule with @host replaced with the component name
-    // into a stylesheet added at the top of head (so it's least specific)
+    // strategy: apply a rule for each @host rule with @host replaced with
+    // the component name into a stylesheet added at the top of head (so it's
+    // least specific)
     if (template) {
       forEach($$(template.content, "style"), function(s) {
         var matches, rule;
         while ((matches = this.hostRe.exec(s.innerHTML))) {
-          rule = this.convertHostRules(matches[1], name) + " " 
+          rule = this.convertHostRules(matches[1], name) + " "
               + matches[2];
           this.hostSheet.appendChild(document.createTextNode(rule));
         }
@@ -202,7 +206,7 @@ elementParser = {
       if (p.indexOf(h) >= 0) {
         var r = p.trim();
         o.push(r.replace(h, name));
-        o.push(r.replace(h, "[is=" + name + "]"));
+        //o.push(r.replace(h, "[is=" + name + "]"));
       }
     });
     return o.join(", ");

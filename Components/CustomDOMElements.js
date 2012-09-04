@@ -21,7 +21,7 @@ var registry = {
 
 // SECTION 4
 
-var instantiate = function(inPrototype, inTemplate, inLifecycle) {
+var instantiate = function(inPrototype/*, inTemplate, inLifecycle*/) {
   // 4.a.1. Create a new object that implements PROTOTYPE
   // 4.a.2. Let ELEMENT by this new object
   //
@@ -41,9 +41,10 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
   // we have attached a flag to identify a generated constructor
   var element = p.constructor.generated ? p.constructor()
     // TODO(sjmiles): ad hoc usage of "div"
-    : document.createElement("div");
+    : document.createElement(inPrototype.is || "div");
   // implement inPrototype
   element.__proto__ = inPrototype;
+  /*
   //
   // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
   //
@@ -60,15 +61,40 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
       var created = inLifecycle.hasOwnProperty(shadowRootCreated)
         && inLifecycle[shadowRootCreated];
       if (created) {
-          created.call(element, shadow);
+        created.call(element, shadow);
       }
   }
   // TODO(sjmiles): OFF SPEC: support lifecycle
   observeAttributeChanges(element, inLifecycle);
+  */
   //
   // OUTPUT
   return element;
 };
+
+var finalize = function(inElement, inTemplate, inLifecycle) {
+  //
+  // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
+  //
+  // spec implementation
+  // 4.a.3. if template was provided
+  if (inTemplate) {
+    // 4.a.3.1 create a shadow root with ELEMENT as it's host
+    // 4.a.3.2. clone template as contents of this shadow root
+    // allow polymorphic shadowDomImpl
+    var shadow = shadowDomImpl.createShadowDom(inElement,
+      inTemplate.content.cloneNode(true));
+    // TODO(sjmiles): OFF SPEC: support lifecycle
+    var shadowRootCreatedName = "shadowRootCreated";
+    var shadowRootCreated = inLifecycle.hasOwnProperty(shadowRootCreatedName)
+      && inLifecycle[shadowRootCreatedName];
+    if (shadowRootCreated) {
+      shadowRootCreated.call(inElement, shadow);
+    }
+  }
+  // TODO(sjmiles): OFF SPEC: support lifecycle
+  observeAttributeChanges(inElement, inLifecycle);
+}
 
 var observeAttributeChanges = function(inElement, inLifecycle) {
   // Setup mutation observer for attribute changes
@@ -100,7 +126,9 @@ var generateConstructor = function(inPrototype, inTemplate, inLifecycle) {
   // 4.b.1.2. Returns algorithm's output as result
   // 4.b.2. Let CONSTRUCTOR be that function object
   var constructor = function() {
-    return instantiate(inPrototype, inTemplate, inLifecycle);
+    var element = instantiate(inPrototype, inTemplate, inLifecycle);
+    finalize(element);
+    return element;
   };
   // TODO(sjmiles): OFF SPEC: flag this constructor so we can identify it
   // in instantiate above
@@ -219,6 +247,11 @@ var upgradeElements = function(inTree, inDefinition) {
     // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
     transplantNode(upgrade, element);
     //element.parentNode.replaceChild(upgrade, element);
+    //
+    // compute redistributions
+    //
+    finalize(upgrade, inDefinition.template,
+      inDefinition.lifecycle);
     //
     // give shadowShim a chance to render
     upgrade.render && upgrade.render();
