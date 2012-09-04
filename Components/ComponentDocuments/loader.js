@@ -46,7 +46,6 @@ var makeDocument = function(inHtml, inName) {
   return doc;
 };
 
-
 // caching parallel loader
 
 // load N resources asynchronously and in parallel with completion tracking and

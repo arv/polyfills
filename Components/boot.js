@@ -8,19 +8,22 @@
 
 scope = scope || {};
 
+// imports
+
+var componentLoader = scope.ComponentDocuments.loader.componentLoader;
+var documentParser = scope.ComponentDocuments.parser;
+var elementParser = scope.CustomDOMElements.elementParser
+
+// 
 // NOTE: uses 'window' and 'document' globals
 
 scope.ready = function() {
-  /*
-scope.declarationFactory.createHostSheet();
-scope.componentLoader.preload(document, function() {
-  scope.parser.parse(document, scope.declarationFactory.declarationFromElement);
-  scope.declarationFactory.morphAll(document);
-*/
-  scope.webComponentsReady();
-/*
-});
-*/
+  elementParser.createHostSheet();
+  componentLoader.preload(document, function() {
+    documentParser.parse(document, elementParser.parse);
+    //scope.declarationFactory.morphAll(document);
+    scope.webComponentsReady(); 
+  });
 };
 
 scope.webComponentsReady = function() {

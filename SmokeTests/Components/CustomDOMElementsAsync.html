@@ -3,7 +3,7 @@
 <head>
   <title></title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <script src="../../Components/components-polyfill.js" export="components" shimShadow></script>
+  <script src="../../Components/components-polyfill.js" export="components" XshimShadow></script>
   <style>
     shadow-root {
       color: silver !important;
@@ -56,6 +56,7 @@
       document.body.appendChild(impElt);
       impElt.orangate();
     };
+    setTimeout(imperative, 100);
     //imperative();
     //
     // declarative instance
@@ -64,7 +65,8 @@
       var decElt = document.querySelector("[is=x-element]");
       decElt.orangate();
     };
-    declarative();
+    setTimeout(declarative, 150);
+    //declarative();
   </script>
   
   <template id="x-subelement">
@@ -92,7 +94,7 @@
       var sub = document.querySelector("[is=x-subelement]");
       sub.orangate();
     };
-    subclass();
+    setTimeout(subclass, 200);
   </script>
 </body>
 </html>

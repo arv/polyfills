@@ -1,0 +1,29 @@
+<!--
+/*
+ * Copyright 2012 The Toolkitchen Authors. All rights reserved.
+ * Use of this source code is goverened by a BSD-style
+ * license that can be found in the LICENSE file.
+ */
+-->
+ 
+<element name="x-element">
+  <template>
+    <style>
+      @host {
+        border: 1px dotted lightblue;
+      }
+    </style>
+    <content></content>
+  </template>
+  <script>
+    this.generatedConstructor.prototype = {
+      foo: 42
+    };
+    this.lifecycle({
+      shadowRootCreated: function(inRoot) {
+        console.log("shadowRootCreated:", inRoot);
+      }
+    });
+  </script>
+</element>
+

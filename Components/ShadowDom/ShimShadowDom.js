@@ -36,11 +36,18 @@ var shimShadow = {
   },
   installDom: function(inInstance) {
     // create a source we can extract nodes from
-    var source = inInstance.lightDom.cloneNode(true);
+    var source = inInstance.lightDom; //.cloneNode(true);
+    var repl = function(n) {
+        var repl = n.cloneNode(true);
+        repl.replaces = n;
+        n.replaced = repl;
+        source.insertBefore(n, repl);
+    };
     // target for installation
     var target = inInstance;
     // shadow dom
-    var shadowDom = target.querySelector("shadow-root");
+    var shadowNodes = target.querySelectorAll("shadow-root");
+    var shadowDom = shadowNodes[shadowNodes.length - 1];
     //var shadowDom = inInstance.shadowDom;
     if (shadowDom) {
       // create mutable shadowDom
@@ -63,6 +70,7 @@ var shimShadow = {
           if ((n.parentNode != source) || isTemplate(n) || isShadowRoot(n)) {
             i++;
           } else {
+            repl(n);
             frag.appendChild(n);
           }
         }
@@ -71,13 +79,16 @@ var shimShadow = {
       });
     } else {
       dom = document.createDocumentFragment();
-      while (source.childNodes[0]) {
-        dom.appendChild(source.childNodes[0]);
+      for (var n; (n=source.childNodes[0]);) {
+        repl(n);
+        dom.appendChild(n);
       }
     }
     // install constructed dom
     target.textContent = '';
-    target.appendChild(shadowDom);
+    for (var i=0, n; n=shadowNodes[i]; i++) {
+      target.appendChild(n);
+    }
     target.appendChild(dom);
   },
   observe: function(inInstance, inDecl) {
@@ -90,7 +101,7 @@ var shimShadow = {
       childList: true,
       subtree: true
     });
-  },
+  }/*,
   renderShadows: function(inDom, inDecl) {
     // if this template dom has a <shadow> node
     var shadow = $(inDom, "shadow");
@@ -113,14 +124,15 @@ var shimShadow = {
     // now render any ancestor shadow DOM (recurse)
     return d && shimShadow.renderShadows(d.shadow, d);
   }
+  */
 };
 
 var isTemplate = function(inNode) {
-	return inNode.tagName == "TEMPLATE";
+	return (inNode.tagName == "TEMPLATE");
 };
 
 var isShadowRoot = function(inNode) {
-  return isNode.tagName == "SHADOW-ROOT";
+  return (inNode.tagName == "SHADOW-ROOT");
 };
 
 // exports

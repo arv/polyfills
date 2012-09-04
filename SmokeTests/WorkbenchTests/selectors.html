@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="../../Components/components-polyfill.js" export="components"></script>
+<!--<link rel="components" href="components.html">-->
+
+<template id="x-element">
+  <content select="div"></content>
+</template>
+
+<template id="x-compose">
+  <x-element>
+     <content></content>
+  </x-element>
+</template>
+
+<x-element>
+  <span>SPAN</span><div>DIV</div>
+</x-element>
+
+<hr />
+
+<x-compose>
+  <span>SPAN</span><div>DIV</div>
+</x-compose>
+
+<script>
+    var proto = components.CustomDOMElements.generatePrototype("div", {
+    });
+    //
+    XElement = document.register("x-element", {
+      prototype: proto,
+      template: document.querySelector("template#x-element"),
+      lifecycle: {
+        created: function(inShadowRoot, inKey) {
+          console.log("x-element created", this.is, inShadowRoot, inKey);
+        }
+      }
+    });
+    
+    var proto = components.CustomDOMElements.generatePrototype("div", {
+    });
+    //
+    XCompose = document.register("x-compose", {
+      prototype: proto,
+      template: document.querySelector("template#x-compose"),
+      lifecycle: {
+        created: function(inShadowRoot, inKey) {
+          console.log("x-compose created", this.is, inShadowRoot, inKey);
+        }
+      }
+    });
+</script>

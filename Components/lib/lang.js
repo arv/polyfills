@@ -52,4 +52,4 @@ if (!Function.prototype.bind) {
       return _this.apply(scope, arguments);
     }
   }
-};
+}

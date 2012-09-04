@@ -61,6 +61,7 @@ var require = function(inSrc) {
   "ComponentDocuments/loader.js",
   "ComponentDocuments/parser.js",
   "CustomDOMElements.js",
+  "HTMLElementElement.js",
   "boot.js"
 ].forEach(require);
 

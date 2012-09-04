@@ -43,7 +43,7 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
     // TODO(sjmiles): ad hoc usage of "div"
     : document.createElement("div");
   // implement inPrototype
-  element.__proto__ = inPrototype;
+  //element.__proto__ = inPrototype;
   //
   // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
   //
@@ -53,12 +53,15 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
     // allow polymorphic shadowDomImpl
-    var shadow = shadowDomImpl.createShadowDom(element, inTemplate.content.cloneNode(true));
-  }
-  // TODO(sjmiles): OFF SPEC: support lifecycle
-  var created = inLifecycle.hasOwnProperty("created") && inLifecycle.created;
-  if (created) {
-      created.call(element, shadow);
+    var shadow = shadowDomImpl.createShadowDom(element, 
+      inTemplate.content.cloneNode(true));
+      // TODO(sjmiles): OFF SPEC: support lifecycle
+      var shadowRootCreated = "shadowRootCreated";
+      var created = inLifecycle.hasOwnProperty(shadowRootCreated) 
+          && inLifecycle[shadowRootCreated];
+      if (created) {
+          created.call(element, shadow);
+      }
   }
   // OUTPUT
   return element;
@@ -142,6 +145,27 @@ var generatePrototype = function(inExtends, inProperties) {
   return prototype;
 };
 
+var transplantNode = function(upgrade, element) {
+		forEach(element.attributes, function(a) {
+			upgrade.setAttribute(a.name, a.value);
+		});
+    var n$ = [];
+    forEach(element.childNodes, function(n) {
+      //if (!isTemplate(n)) {
+        n$.push(n);
+      //}
+    });
+    // TODO(sjmiles): make bug reduction: appending children after creating 
+    // shadow DOM seems to result in an unstable node if n$.length == 1 and
+    // n$[0] is a text node
+    forEach(n$, function(n) {
+        //console.log(n);
+        upgrade.appendChild(n);
+		});
+    //
+    element.parentNode.replaceChild(upgrade, element);
+};
+
 var upgradeElements = function(inTree, inDefinition) {
   // 6.b.1 Let NAME be the custom element name part of DEFINITION
   var name = inDefinition.name;
@@ -167,7 +191,12 @@ var upgradeElements = function(inTree, inDefinition) {
     }
     */
     // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
-    element.parentNode.replaceChild(upgrade, element);
+    transplantNode(upgrade, element);
+    //element.parentNode.replaceChild(upgrade, element);
+    //
+    // give shadowShim a chance to render
+    upgrade.render && upgrade.render();
+    //
     // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
     // attribute set to true.
     /* TODO(sjmiles) */
@@ -266,11 +295,7 @@ var register = function(inName, inOptions) {
 
 // SECTION 7.2
 
-HTMLElementElement = function(inElement) {
-  this.name = inElement.getAttribute("name");
-  this.constructorName = inElement.getAttribute("constructor");
-  this.extendsName = inElement.getAttribute("extendsName");
-};
+// see HTMLElementElement.js
 
 // exports
 
@@ -281,7 +306,7 @@ var exports = {
   upgradeElements: upgradeElements,
   validateArguments: validateArguments,
   register: register,
-  HTMLElementElement: HTMLElementElement
+  registry: registry
 };
 
 scope.CustomDOMElements = exports;
