@@ -28,7 +28,7 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
   // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
   // our solution is to call extendee constructor, if it's generated
   // and create a base element if not.
-  // 
+  //
   // This is tricky to reconcile with spec, since the concepts
   // of base element and prototype swizzling are polyfil
   // concerns.
@@ -39,11 +39,11 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
     p = p.__proto__;
   }
   // we have attached a flag to identify a generated constructor
-  var element = p.constructor.generated ? p.constructor() 
+  var element = p.constructor.generated ? p.constructor()
     // TODO(sjmiles): ad hoc usage of "div"
     : document.createElement("div");
   // implement inPrototype
-  //element.__proto__ = inPrototype;
+  element.__proto__ = inPrototype;
   //
   // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
   //
@@ -53,18 +53,44 @@ var instantiate = function(inPrototype, inTemplate, inLifecycle) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
     // allow polymorphic shadowDomImpl
-    var shadow = shadowDomImpl.createShadowDom(element, 
+    var shadow = shadowDomImpl.createShadowDom(element,
       inTemplate.content.cloneNode(true));
       // TODO(sjmiles): OFF SPEC: support lifecycle
       var shadowRootCreated = "shadowRootCreated";
-      var created = inLifecycle.hasOwnProperty(shadowRootCreated) 
-          && inLifecycle[shadowRootCreated];
+      var created = inLifecycle.hasOwnProperty(shadowRootCreated)
+        && inLifecycle[shadowRootCreated];
       if (created) {
           created.call(element, shadow);
       }
   }
+  // TODO(sjmiles): OFF SPEC: support lifecycle
+  observeAttributeChanges(element, inLifecycle);
+  //
   // OUTPUT
   return element;
+};
+
+var observeAttributeChanges = function(inElement, inLifecycle) {
+  // Setup mutation observer for attribute changes
+  //
+  // TODO(sjmiles): Consider a design change here: for a given instance we
+  // attach this observer for each component in the extension chain. This is
+  // necessary because attributeChanged is stored in the declaration lifecycle.
+  //
+  if (inLifecycle.attributeChanged && window.WebKitMutationObserver) {
+    var observer = new WebKitMutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        inLifecycle.attributeChanged.call(inElement, m.attributeName,
+          m.oldValue, m.target.getAttribute(m.attributeName));
+      });
+    });
+    //
+    console.log("attaching mutation observer to ", inElement)
+    observer.observe(inElement, {
+      attributes: true,
+      attributeOldValue: true
+    });
+  }
 };
 
 var generateConstructor = function(inPrototype, inTemplate, inLifecycle) {
@@ -76,7 +102,7 @@ var generateConstructor = function(inPrototype, inTemplate, inLifecycle) {
   var constructor = function() {
     return instantiate(inPrototype, inTemplate, inLifecycle);
   };
-  // TODO(sjmiles): OFF SPEC: flag this constructor so we can identify it 
+  // TODO(sjmiles): OFF SPEC: flag this constructor so we can identify it
   // in instantiate above
   constructor.generated = true;
   // 4.b.3. Set PROTOTYPE as the prototype property on CONSTRUCTOR
@@ -155,7 +181,7 @@ var transplantNode = function(upgrade, element) {
         n$.push(n);
       //}
     });
-    // TODO(sjmiles): make bug reduction: appending children after creating 
+    // TODO(sjmiles): make bug reduction: appending children after creating
     // shadow DOM seems to result in an unstable node if n$.length == 1 and
     // n$[0] is a text node
     forEach(n$, function(n) {
@@ -256,20 +282,20 @@ var register = function(inName, inOptions) {
     // TODO(sjmiles): OFF SPEC: lifecycle not in spec
     lifecycle: lifecycle
   };
-  // 
+  //
   // TODO(sjmiles): OFF SPEC: get tricky with lifecycle
   var ancestor = registry[prototype.extendsName];
   if (ancestor) {
     lifecycle.__proto__ = ancestor.lifecycle;
   }
-  // 
+  //
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registry[inName] = definition;
   //
   // TODO(sjmiles): OFFSPEC: re-ordering the flow
   // so that prototype has the correct constructor on it
   // at instantiate time (when we call upgradeElements)
-  // 
+  //
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
   // and TEMPLATE as arguments
   // 7.1.8. Return the output of the previous step.
@@ -284,7 +310,7 @@ var register = function(inName, inOptions) {
   // TODO(sjmiles): "and every shadow DOM subtree" may not be possible
   // from polyfill. We will ensure this happens for shadow subtrees
   // created by this polyfill, but any others are invisible.
-  // 
+  //
   // 7.1.6.1. Let TREE be this tree
   // 7.1.6.2. Run element upgrade algorithm with TREE and DEFINITION as
   // arguments
