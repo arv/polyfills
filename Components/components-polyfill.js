@@ -37,7 +37,8 @@ var source, base = "";
 
 var flags = scope.flags = {
   exportAs: source.getAttribute("export"),
-  shimShadow: source.hasAttribute("shimshadow")
+  shimShadow: source.hasAttribute("shimshadow"),
+  unShadow: source.hasAttribute("unshadow")
 };
 
 console.log(flags);
@@ -56,6 +57,7 @@ var require = function(inSrc) {
   "lib/lang.js",
   "ShadowDom/WebkitShadowDom.js",
   "ShadowDom/ShimShadowDom.js",
+  "ShadowDom/UnShadowDom.js",
   "ShadowDom/ShadowDom.js",
   "ComponentDocuments/path.js",
   "ComponentDocuments/loader.js",
