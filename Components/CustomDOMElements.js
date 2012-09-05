@@ -62,8 +62,13 @@ var finalize = function(inElement, inDefinition) {
       createShadowDom(inElement, definition);
       // TODO(sjmiles): OFF SPEC: support lifecycle
       observeAttributeChanges(inElement, definition);
+      upgradeAll(inElement);
     }
   }
+  //
+  //createShadowDom(inElement, inDefinition);
+  renderShadowDom(inElement, inDefinition);
+  //
   // TODO(sjmiles): OFF SPEC: support lifecycle
   if (inDefinition.lifecycle.created) {
     // TODO(sjmiles): OFF SPEC: inDefinition.prototype.extendsName
@@ -91,6 +96,13 @@ var createShadowDom = function(inElement, inDefinition) {
     }
   }
   return shadow;
+};
+
+var renderShadowDom = function(inElement, inDefinition) {
+  if (inDefinition.template) {
+    // use polymorphic shadowDomImpl
+    shadowDomImpl.installDom(inElement);
+  }
 };
 
 var observeAttributeChanges = function(inElement, inDefinition) {
@@ -251,9 +263,6 @@ var upgradeElements = function(inTree, inDefinition) {
     // compute redistributions
     //
     finalize(upgrade, inDefinition);
-    //
-    // give shadowShim a chance to render
-    upgrade.render && upgrade.render();
     //
     // we need to upgrade any custom elements that appeared
     // as a result of this upgrade

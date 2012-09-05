@@ -3,21 +3,33 @@
 scope = scope || {};
 
 var unShadow = {
-  createShadowDom: function(inInstance, inContents) {
+  createShadowDom: function(inInstance, inContent) {
+    // memoize lightDom (sort of)
     inInstance.lightDom = inInstance;
-    inInstance.shadowDom = inContents;
-    unShadow.installDom(inInstance);
+    // create shadowRoot
+    var shadowRoot = document.createElement("shadow-root");
+    shadowRoot.style.cssText = "display: none;";
+    shadowRoot.content = inContent;
+    // install shadow root on instance
+    inInstance.appendChild(shadowRoot);
+    // for debug/visualization purposes only
+    shadowRoot.appendChild(inContent.cloneNode(true));
+    // cache the shadowDom instance
+    inInstance.shadowRoot = shadowRoot;
+    return inInstance;
   },
   installDom: function(inInstance) {
     // create a source we can extract nodes from
     var source = inInstance;
     // target for installation
     var target = inInstance;
+    // get all shadow roots
+    var shadowRoots = target.querySelectorAll("shadow-root");
     // shadow dom
-    var shadowDom = inInstance.shadowDom;
-    if (shadowDom) {
+    var shadowRoot = inInstance.shadowRoot;
+    if (shadowRoot) {
       // create mutable shadowDom
-      var dom = shadowDom.cloneNode(true);
+      var dom = shadowRoot.content.cloneNode(true);
       // build a immutable list of template <content> elements
       var c$ = [];
       $$(dom, "content").forEach(function(content) {
@@ -48,9 +60,10 @@ var unShadow = {
     }
     // install constructed dom
     target.textContent = '';
-    //for (var i=0, n; n=shadowNodes[i]; i++) {
-    //  target.appendChild(n);
-    //}
+    // for visualizing shadow roots only
+    for (i=0, n; n=shadowRoots[i]; i++) {
+      target.appendChild(n);
+    }
     target.appendChild(dom);
   },
   observe: function(inInstance, inDecl) {
