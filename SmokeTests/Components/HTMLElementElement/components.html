@@ -64,3 +64,16 @@
     });
   </script>
 </element>
+
+<element name="x-composite-more">
+  <template>
+    [<content select="span"></content>]
+    [<x-inherited><content select="code"></content></x-inherited>]
+    [<x-element><content></content></x-element>]
+
+  </template>
+  <script>
+    this.generatedConstructor.prototype = {
+    };
+  </script>
+</element>
