@@ -64,6 +64,13 @@ var finalize = function(inElement, inDefinition) {
       observeAttributeChanges(inElement, definition);
     }
   }
+  // TODO(sjmiles): OFF SPEC: support lifecycle
+  if (inDefinition.lifecycle.created) {
+    // TODO(sjmiles): OFF SPEC: inDefinition.prototype.extendsName
+    var ancestor = registry[inDefinition.prototype.extendsName];
+    inDefinition.lifecycle.created.call(inElement,
+      ancestor && ancestor.lifecycle.created);
+  }
 };
 
 var createShadowDom = function(inElement, inDefinition) {

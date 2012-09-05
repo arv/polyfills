@@ -11,9 +11,7 @@
       @host {
         border: 1px dotted lightblue;
       }
-    </style>
-    x-<content></content>-x
-  </template>
+    </style>x-<content></content>-x</template>
   <script>
     this.generatedConstructor.prototype = {
       foo: 42
@@ -21,6 +19,9 @@
     this.lifecycle({
       shadowRootCreated: function(inRoot) {
         console.log("shadowRootCreated:", inRoot);
+      },
+      created: function(inSuper) {
+        console.log("created:", inSuper);
       }
     });
   </script>
@@ -38,8 +39,28 @@
     this.lifecycle({
       shadowRootCreated: function(inRoot) {
         console.log("shadowRootCreated:", inRoot);
+      },
+      created: function(inSuper) {
+        console.log("created:", inSuper);
       }
     });
   </script>
 </element>
 
+<element name="x-inherited" extends="x-element">
+  <template>
+    y-<content></content>-y
+  </template>
+  <script>
+    this.generatedConstructor.prototype = {
+    };
+    this.lifecycle({
+      shadowRootCreated: function(inRoot) {
+        console.log("shadowRootCreated:", inRoot);
+      },
+      created: function(inSuper) {
+        console.log("created:", inSuper);
+      }
+    });
+  </script>
+</element>
