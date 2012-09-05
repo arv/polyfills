@@ -26,3 +26,20 @@
   </script>
 </element>
 
+<element name="x-composite">
+  <template>
+    [<x-element>
+      <content></content>
+    </x-element>]
+  </template>
+  <script>
+    this.generatedConstructor.prototype = {
+    };
+    this.lifecycle({
+      shadowRootCreated: function(inRoot) {
+        console.log("shadowRootCreated:", inRoot);
+      }
+    });
+  </script>
+</element>
+

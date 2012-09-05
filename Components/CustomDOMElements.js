@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 The Toolkitchen Authors. All rights reserved.
- * Use of this source code is goverened by a BSD-style
+ * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
 
@@ -25,88 +25,79 @@ var instantiate = function(inPrototype/*, inTemplate, inLifecycle*/) {
   // 4.a.1. Create a new object that implements PROTOTYPE
   // 4.a.2. Let ELEMENT by this new object
   //
-  // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
-  // our solution is to call extendee constructor, if it's generated
-  // and create a base element if not.
+  // the custom element instantiation algorithm must also ensure that the
+  // output is a valid DOM element with the proper wrapper in place.
   //
-  // This is tricky to reconcile with spec, since the concepts
-  // of base element and prototype swizzling are polyfil
-  // concerns.
-  //
-  // search for an extendee constructor
-  var p = inPrototype;
-  while (p && (p.constructor === inPrototype.constructor)) {
-    p = p.__proto__;
-  }
-  // we have attached a flag to identify a generated constructor
-  var element = p.constructor.generated ? p.constructor()
-    // TODO(sjmiles): ad hoc usage of "div"
-    : document.createElement(inPrototype.is || "div");
-  // implement inPrototype
+  var element = document.createElement(inPrototype.is);
   element.__proto__ = inPrototype;
-  /*
-  //
-  // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
-  //
-  // spec implementation
-  // 4.a.3. if template was provided
-  if (inTemplate) {
-    // 4.a.3.1 create a shadow root with ELEMENT as it's host
-    // 4.a.3.2. clone template as contents of this shadow root
-    // allow polymorphic shadowDomImpl
-    var shadow = shadowDomImpl.createShadowDom(element,
-      inTemplate.content.cloneNode(true));
-      // TODO(sjmiles): OFF SPEC: support lifecycle
-      var shadowRootCreated = "shadowRootCreated";
-      var created = inLifecycle.hasOwnProperty(shadowRootCreated)
-        && inLifecycle[shadowRootCreated];
-      if (created) {
-        created.call(element, shadow);
-      }
-  }
-  // TODO(sjmiles): OFF SPEC: support lifecycle
-  observeAttributeChanges(element, inLifecycle);
-  */
   //
   // OUTPUT
   return element;
 };
 
-var finalize = function(inElement, inTemplate, inLifecycle) {
+var finalize = function(inElement, inDefinition) {
   //
-  // TODO(sjmiles): spec omits instantiation of superclass shadow DOM
+  // 4.a.3. Let CHAIN be ELEMENT's prototype chain, in reverse order
+  // (starting with the most-derived object)
+  // 4.a.4. For each item in CHAIN:
+  //  1. Let ITEM be this item
+  //  2. Let DEFINITION be a registered element definition that has ITEM as
+  //  element prototype.
+  //  3. If DEFINITION was not found, stop.
+  //  4. If DEFINITION has element template:
+  //    1. Let TEMPLATE be this template
+  //    2. Create a shadow root with ELEMENT as its host
+  //    3. Clone TEMPLATE as contents of this shadow root
   //
-  // spec implementation
-  // 4.a.3. if template was provided
-  if (inTemplate) {
+  // dive for the most-derived object
+  var p = inDefinition.prototype, chain = [inDefinition];
+  while (p.extendsName) {
+    chain.push(registry[p.extendsName]);
+    p = p.__proto__;
+  }
+  // swim back up
+  while (chain.length) {
+    var definition = chain.pop();
+    if (definition) {
+      createShadowDom(inElement, definition);
+      // TODO(sjmiles): OFF SPEC: support lifecycle
+      observeAttributeChanges(inElement, definition);
+    }
+  }
+};
+
+var createShadowDom = function(inElement, inDefinition) {
+  if (inDefinition.template) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
-    // allow polymorphic shadowDomImpl
+    //
+    // use polymorphic shadowDomImpl
     var shadow = shadowDomImpl.createShadowDom(inElement,
-      inTemplate.content.cloneNode(true));
+      inDefinition.template.content.cloneNode(true));
+    //
     // TODO(sjmiles): OFF SPEC: support lifecycle
+    //
     var shadowRootCreatedName = "shadowRootCreated";
-    var shadowRootCreated = inLifecycle.hasOwnProperty(shadowRootCreatedName)
-      && inLifecycle[shadowRootCreatedName];
+    var shadowRootCreated = inDefinition.lifecycle[shadowRootCreatedName];
     if (shadowRootCreated) {
       shadowRootCreated.call(inElement, shadow);
     }
   }
-  // TODO(sjmiles): OFF SPEC: support lifecycle
-  observeAttributeChanges(inElement, inLifecycle);
-}
+  return shadow;
+};
 
-var observeAttributeChanges = function(inElement, inLifecycle) {
+var observeAttributeChanges = function(inElement, inDefinition) {
   // Setup mutation observer for attribute changes
   //
-  // TODO(sjmiles): Consider a design change here: for a given instance we
-  // attach this observer for each component in the extension chain. This is
-  // necessary because attributeChanged is stored in the declaration lifecycle.
+  // TODO(sjmiles): attaches a fresh observer for each
+  // inherited definition. Instead, build one observer and have it walk
+  // the definition chain to find change handlers.
   //
-  if (inLifecycle.attributeChanged && window.WebKitMutationObserver) {
+  var lc = inDefinition.lifecycle;
+  if (lc.attributeChanged && window.WebKitMutationObserver){
     var observer = new WebKitMutationObserver(function(mutations) {
       mutations.forEach(function(m) {
-        inLifecycle.attributeChanged.call(inElement, m.attributeName,
+        lc.attributeChanged.call(inElement, m.attributeName,
           m.oldValue, m.target.getAttribute(m.attributeName));
       });
     });
@@ -119,105 +110,101 @@ var observeAttributeChanges = function(inElement, inLifecycle) {
   }
 };
 
-var generateConstructor = function(inPrototype, inTemplate, inLifecycle) {
+var generateConstructor = function(inDefinition) {
   // 4.b.1. Generate a function object which, when called:
   // 4.b.1.1. Runs the custom element instantiation algorithm with PROTOTYPE
   // and TEMPLATE as arguments.
   // 4.b.1.2. Returns algorithm's output as result
   // 4.b.2. Let CONSTRUCTOR be that function object
   var constructor = function() {
-    var element = instantiate(inPrototype, inTemplate, inLifecycle);
-    finalize(element);
+    var element = instantiate(inDefinition.prototype);
+    finalize(element, inDefinition.prototype);
     return element;
   };
   // TODO(sjmiles): OFF SPEC: flag this constructor so we can identify it
   // in instantiate above
   constructor.generated = true;
   // 4.b.3. Set PROTOTYPE as the prototype property on CONSTRUCTOR
-  constructor.prototype = inPrototype;
+  constructor.prototype = inDefinition.prototype;
   // 4.b.3. Set CONSTRUCTOR as the constructor property on PROTOTYPE.
-  inPrototype.constructor = constructor;
+  inDefinition.prototype.constructor = constructor;
   return constructor;
 };
 
-// SECTION 6
+// SECTION 5
 
 var generatePrototype = function(inExtends, inProperties) {
-  // 6.a.1 If EXTENDS is an invalid HTML tag name, throw an
+  // 5.a.1 If EXTENDS is an invalid HTML tag name, throw an
   // InvalidCharacterError exception.
   if (!inExtends) {
-    throw "6.1. InvalidCharacterError: extends must be a valid HTML tag name";
+    throw "5.a.1. InvalidCharacterError: extends must be a valid HTML tag name";
   }
-  // 6.a.2. If EXTENDS is a custom element name, let BASE be the element
+  // 5.a.2. If EXTENDS is a custom element name, let BASE be the element
   // prototype of the custom DOM element with the custom element name EXTENDS
   if (registry[inExtends]) {
     var base = registry[inExtends].prototype;
-    // 6.a.3.3 Create a new object that implements BASE
-    // 6.a.3.4 Let PROTOTYPE be this new object
-    var prototype = Object.create(base);
   }
   else {
-    // TODO(sjmiles): seems like spec is unclear here
-    // I think 6.a.3 means: try to resolve BASE, throw an exception
-    // if you cannot.
-    // It's worded strangely because BASE is tested before it's
-    // defined.
-    // 6.a.3. Otherwise
-    // 6.a.3.1 If BASE is defined in HTML specification or other applicable
-    // specifications, let BASE be the interface prototype object for the element
-    // type corresponding to the HTML tag name of EXTENDS
-    // 6.a.3.2 Otherwise, throw a NotSupportedError exception.
-    /* TODO(sjmiles): validation */
-    // 6.a.3.3 Create a new object that implements BASE
-    // 6.a.3.4 Let PROTOTYPE be this new object
-    prototype = document.createElement(inExtends);
+    // 5.a.3. Otherwise
+    // 5.a.3.1 If EXTENDS is defined in HTML specification or other applicable
+    // specifications, let BASE be the interface prototype object for the
+    // element type corresponding to the HTML tag name of EXTENDS
+    // 5.a.3.2 Otherwise, throw a NotSupportedError exception.
+    // TODO(sjmiles): validation
+    base = document.createElement(inExtends).__proto__;
   }
-  // 6.a.3.5 If PROPERTIES is present and not undefined, define properties on
-  // PROTOTYPE using PROPERTIES
   //
   // TODO(sjmiles): this is improper implementation of 'define properties'
   // the spec means Object.defineProperties
+  // we are using prototype swizzling instead, which also
+  // means we don't need 'object that implements BASE'
+  // as in spec.
+  //
+  // 5.a.4 Create a new object that implements BASE
+  // 5.a.5 Let PROTOTYPE be this new object
+  //var prototype = Object.create(base);
+  //
+  // 5.a.3.5 If PROPERTIES is present and not undefined, define properties on
+  // PROTOTYPE using PROPERTIES
   //
   // TODO(sjmiles): handle undefined inProperties
-  var properties = inProperties || {};
+  //
+  // strategy: properties as prototype
+  //
+  var prototype = inProperties || {};
+  //
+  // chain the prototype to base
+  //
+  prototype.__proto__ = base;
   //
   // TODO(sjmiles): OFF SPEC: we need to store our extends name somewhere
   // so we can look up ancestor properties during initialization
   //
-  properties.extendsName = inExtends;
+  prototype.extendsName = inExtends;
   //
-  // strategy: insert 'inProperties' between the element
-  // instance and it's original prototype chain.
-  //
-  // assumes inProperties has trivial proto (it's clipped off)
-  //
-  // chain the element's proto to inProperties
-  properties.__proto__ = prototype.__proto__;
-  // now use inProperties as the elements proto
-  prototype.__proto__ = properties;
   // OUTPUT
   return prototype;
 };
 
 var transplantNode = function(upgrade, element) {
-		forEach(element.attributes, function(a) {
-			upgrade.setAttribute(a.name, a.value);
-		});
-    var n$ = [];
-    forEach(element.childNodes, function(n) {
-      //if (!isTemplate(n)) {
-        n$.push(n);
-      //}
-    });
-    // TODO(sjmiles): make bug reduction: appending children after creating
-    // shadow DOM seems to result in an unstable node if n$.length == 1 and
-    // n$[0] is a text node
-    forEach(n$, function(n) {
-        //console.log(n);
-        upgrade.appendChild(n);
-		});
-    //
-    element.parentNode.replaceChild(upgrade, element);
+  forEach(element.attributes, function(a) {
+    upgrade.setAttribute(a.name, a.value);
+  });
+  var n$ = [];
+  forEach(element.childNodes, function(n) {
+    //if (!isTemplate(n)) {
+      n$.push(n);
+    //}
+  });
+  // TODO(sjmiles): make bug reduction: appending children after creating
+  // shadow DOM seems to result in an unstable node if n$.length == 1 and
+  // n$[0] is a text node
+  forEach(n$, function(n) {
+      //console.log(n);
+      upgrade.appendChild(n);
+  });
+  //
+  element.parentNode.replaceChild(upgrade, element);
 };
 
 var upgradeElements = function(inTree, inDefinition) {
@@ -226,6 +213,12 @@ var upgradeElements = function(inTree, inDefinition) {
   // 6.b.2 For each element ELEMENT in TREE whose custom element name is NAME:
   var elements = inTree.querySelectorAll(name);
   for (var i=0, element; element=elements[i]; i++) {
+    // do not re-upgrade
+    if (element.__upgraded__) {
+      return;
+    }
+    element.__upgraded__ = true;
+    //
     // 6.b.2.3. Let UPGRADE be the result of running custom element
     // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
     var upgrade = instantiate(inDefinition.prototype, inDefinition.template,
@@ -250,16 +243,25 @@ var upgradeElements = function(inTree, inDefinition) {
     //
     // compute redistributions
     //
-    finalize(upgrade, inDefinition.template,
-      inDefinition.lifecycle);
+    finalize(upgrade, inDefinition);
     //
     // give shadowShim a chance to render
     upgrade.render && upgrade.render();
+    //
+    // we need to upgrade any custom elements that appeared
+    // as a result of this upgrade
+    upgradeAll(upgrade);
     //
     // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
     // attribute set to true.
     /* TODO(sjmiles) */
   }
+};
+
+var	upgradeAll = function(inNode) {
+	for (var n in this.registry) {
+		upgradeElements(inNode, this.registry[n]);
+	}
 };
 
 // SECTION 5
@@ -333,7 +335,7 @@ var register = function(inName, inOptions) {
   // and TEMPLATE as arguments
   // 7.1.8. Return the output of the previous step.
   // 7. Output: CONSTRUCTOR, the custom element constructor
-  var ctor = generateConstructor(prototype, template, lifecycle);
+  var ctor = generateConstructor(definition);
   // TODO(sjmiles): OFF SPEC: for deubgging only
   ctor.tag = inName;
   //
@@ -349,6 +351,7 @@ var register = function(inName, inOptions) {
   // arguments
   //
   upgradeElements(document, definition);
+  //
   return ctor;
 };
 
@@ -358,17 +361,16 @@ var register = function(inName, inOptions) {
 
 // exports
 
-var exports = {
+scope.CustomDOMElements = {
+  registry: registry,
   instantiate: instantiate,
   generateConstructor: generateConstructor,
   generatePrototype: generatePrototype,
   upgradeElements: upgradeElements,
+  upgradeAll: upgradeAll,
   validateArguments: validateArguments,
-  register: register,
-  registry: registry
+  register: register
 };
-
-scope.CustomDOMElements = exports;
 
 // new public API
 
