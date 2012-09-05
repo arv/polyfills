@@ -259,8 +259,8 @@ var upgradeElements = function(inTree, inDefinition) {
 };
 
 var	upgradeAll = function(inNode) {
-	for (var n in this.registry) {
-		upgradeElements(inNode, this.registry[n]);
+	for (var n in registry) {
+		upgradeElements(inNode, registry[n]);
 	}
 };
 
