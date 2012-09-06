@@ -119,7 +119,7 @@ HTMLElementElement.prototype = {
       name: this.name,
       prototype: this.prototype,
       template: this.template,
-      lifecycle: this.lifecycleImpl
+      lifecycle: this.lifecycleImpl || {}
     };
     CustomDOMElements.registry[this.name] = definition;
     CustomDOMElements.upgradeElements(document, definition);
