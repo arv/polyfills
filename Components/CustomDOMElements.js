@@ -13,8 +13,6 @@ scope = scope || {};
 var shadowDomImpl = scope.shadowDomImpl;
 
 // custom element definition registry (name: definition)
-// TODO(sjmiles): coordinate with spec, I suppose this just a implementation
-// detail?
 
 var registry = {
 };
@@ -49,32 +47,57 @@ var finalize = function(inElement, inDefinition) {
   //    2. Create a shadow root with ELEMENT as its host
   //    3. Clone TEMPLATE as contents of this shadow root
   //
-  // dive for the most-derived object
-  var p = inDefinition.prototype, chain = [inDefinition];
-  while (p.extendsName) {
-    chain.push(registry[p.extendsName]);
-    p = p.__proto__;
+  // build a chain of derived objects (including this one)
+  // first element is most-derived object
+  var chain = getAncestorChain(inDefinition);
+  //
+  // cache shadows so we can call 'shadowRootCreated' asynchronously
+  var shadows = [];
+  //
+  // walk the chain to create shadows
+  chain.forEach(function(definition) {
+    // create shadow dom, cache the root
+    shadows.push(createShadowDom(inElement, definition));
+  });
+  //
+  // do shadow dom distribution (for shims that do this imperatively)
+  if (inDefinition.template) {
+    // use polymorphic shadowDomImpl
+    shadowDomImpl.installDom(inElement);
   }
-  // swim back up
-  while (chain.length) {
-    var definition = chain.pop();
-    if (definition) {
-      createShadowDom(inElement, definition);
-      // TODO(sjmiles): OFF SPEC: support lifecycle
-      observeAttributeChanges(inElement, definition);
+  //
+  // TODO(sjmiles): OFF SPEC:
+  // walk ancestor chain again in support of lifecycle.shadowRootCreated
+  // and lifecycle.attributeChanged
+  chain.forEach(function(definition, i) {
+    var fn = definition.lifecycle.shadowRootCreated;
+    if (fn) {
+      fn.call(inElement, shadows[i]);
     }
-  }
+    // TODO(sjmiles): OFF SPEC: support lifecycle.attributeChanged
+    // TODO(sjmiles): redesign so we only do this once
+    observeAttributeChanges(inElement, definition);
+  });
   //
-  //createShadowDom(inElement, inDefinition);
-  renderShadowDom(inElement, inDefinition);
-  //
-  // TODO(sjmiles): OFF SPEC: support lifecycle
+  // TODO(sjmiles): OFF SPEC: support lifecycle.created
   if (inDefinition.lifecycle.created) {
     // TODO(sjmiles): OFF SPEC: inDefinition.prototype.extendsName
     var ancestor = registry[inDefinition.prototype.extendsName];
     inDefinition.lifecycle.created.call(inElement,
       ancestor && ancestor.lifecycle.created);
   }
+};
+
+var getAncestorChain = function(inDefinition) {
+  // build a chain of derived definitions (including inDefintion)
+  // first element is most-derived object
+  var chain = [inDefinition];
+  var p = inDefinition.prototype;
+  while (registry[p.extendsName]) {
+    chain.unshift(registry[p.extendsName]);
+    p = p.__proto__;
+  }
+  return chain;
 };
 
 var createShadowDom = function(inElement, inDefinition) {
@@ -96,13 +119,6 @@ var createShadowDom = function(inElement, inDefinition) {
     }
   }
   return shadow;
-};
-
-var renderShadowDom = function(inElement, inDefinition) {
-  if (inDefinition.template) {
-    // use polymorphic shadowDomImpl
-    shadowDomImpl.installDom(inElement);
-  }
 };
 
 var observeAttributeChanges = function(inElement, inDefinition) {
@@ -243,19 +259,9 @@ var upgradeElements = function(inTree, inDefinition) {
     var upgrade = instantiate(inDefinition.prototype, inDefinition.template,
       inDefinition.lifecycle);
     //
-    // TODO(sjmiles): not in spec
-    //
+    // TODO(sjmiles): OFF SPEC: attach 'is' attribute
     upgrade.setAttribute("is", inDefinition.name);
-    /*
-    // TODO(sjmiles): lifecycle not in spec
-    if (inDefinition.lifecycle.created) {
-      // TODO(sjmiles): inDefinition.prototype.extendsName not in spec,
-      // see above
-      var ancestor = registry[inDefinition.prototype.extendsName];
-      inDefinition.lifecycle.created(upgrade,
-        ancestor && ancestor.lifecycle.key);
-    }
-    */
+    //
     // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
     transplantNode(upgrade, element);
     //element.parentNode.replaceChild(upgrade, element);
@@ -270,7 +276,7 @@ var upgradeElements = function(inTree, inDefinition) {
     //
     // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
     // attribute set to true.
-    /* TODO(sjmiles) */
+    // TODO(sjmiles): implement elementupgrade event
   }
 };
 
