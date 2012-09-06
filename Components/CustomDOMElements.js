@@ -108,15 +108,6 @@ var createShadowDom = function(inElement, inDefinition) {
     // use polymorphic shadowDomImpl
     var shadow = shadowDomImpl.createShadowDom(inElement,
       inDefinition.template.content.cloneNode(true));
-    // upgrade custom elements in shadow dom
-    upgradeAll(shadow);
-    // TODO(sjmiles): OFF SPEC: support lifecycle
-    //
-    var shadowRootCreatedName = "shadowRootCreated";
-    var shadowRootCreated = inDefinition.lifecycle[shadowRootCreatedName];
-    if (shadowRootCreated) {
-      shadowRootCreated.call(inElement, shadow);
-    }
   }
   return shadow;
 };
