@@ -35,19 +35,22 @@ var source, base = "";
   };
 })();
 
-var flags = scope.flags = {
-  exportAs: source.getAttribute("export"),
-  shimShadow: source.hasAttribute("shimshadow"),
-  unShadow: source.hasAttribute("unshadow")
-};
-
+var flags = {};
+for (var i=0, a; (a = source.attributes[i]); i++) {
+  flags[a.name] = a.value || true;
+}
 console.log(flags);
 
-if (flags.exportAs) {
-  window[flags.exportAs] = scope;
-}
+// support exportas directive
 
+if (flags.exportas) {
+  window[flags.exportas] = scope;
+}
 window.__exported_components_polyfill_scope__ = scope;
+
+// module exports
+
+scope.flags = flags;
 
 var require = function(inSrc) {
   document.write('<script src="' + base + inSrc + '"></script>');
