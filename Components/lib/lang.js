@@ -22,7 +22,7 @@ if (!Function.prototype.bind) {
 
 // missing DOM/JS API
 
-var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach.call);
+var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
 function $(inElement, inSelector) {
   if (arguments.length == 1) {
