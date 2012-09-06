@@ -10,10 +10,16 @@ var unShadow = {
     var shadowRoot = document.createElement("shadow-root");
     shadowRoot.style.cssText = "display: none;";
     shadowRoot.content = inContent;
-    // install shadow root on instance
-    inInstance.appendChild(shadowRoot);
-    // for debug/visualization purposes only
-    shadowRoot.appendChild(inContent.cloneNode(true));
+    // add to internal shadow stack
+    inInstance.shadows = inInstance.shadows || [];
+    inInstance.shadows.push(shadowRoot);
+    if (scope.flags.showshadow) {
+      // for debug/visualization purposes only
+      // install shadow root on instance
+      inInstance.appendChild(shadowRoot);
+      // with a copy of its content
+      shadowRoot.appendChild(inContent.cloneNode(true));
+    }
     // cache the shadowDom instance
     inInstance.shadowRoot = shadowRoot;
     return inInstance;
@@ -60,9 +66,11 @@ var unShadow = {
     }
     // install constructed dom
     target.textContent = '';
-    // for visualizing shadow roots only
-    for (i=0, n; n=shadowRoots[i]; i++) {
-      target.appendChild(n);
+    if (scope.flags.showshadow) {
+      // for visualizing shadow roots only
+      for (i=0, n; n=shadowRoots[i]; i++) {
+        target.appendChild(n);
+      }
     }
     target.appendChild(dom);
   },
