@@ -64,6 +64,8 @@ var finalize = function(inElement, inDefinition) {
   if (inDefinition.template) {
     // use polymorphic shadowDomImpl
     shadowDomImpl.installDom(inElement);
+    // upgrade custom elements that came from templates
+    upgradeAll(inElement);
   }
   //
   // TODO(sjmiles): OFF SPEC:
@@ -78,6 +80,10 @@ var finalize = function(inElement, inDefinition) {
     // TODO(sjmiles): redesign so we only do this once
     observeAttributeChanges(inElement, definition);
   });
+  //
+  // upgrade custom elements that haven't been upgraded yet (due to race
+  // condition in light dom upgrade, or user manipulation)
+  upgradeAll(inElement);
   //
   // TODO(sjmiles): OFF SPEC: support lifecycle.created
   if (inDefinition.lifecycle.created) {
@@ -108,15 +114,6 @@ var createShadowDom = function(inElement, inDefinition) {
     // use polymorphic shadowDomImpl
     var shadow = shadowDomImpl.createShadowDom(inElement,
       inDefinition.template.content.cloneNode(true));
-    // upgrade custom elements in shadow dom
-    upgradeAll(shadow);
-    // TODO(sjmiles): OFF SPEC: support lifecycle
-    //
-    var shadowRootCreatedName = "shadowRootCreated";
-    var shadowRootCreated = inDefinition.lifecycle[shadowRootCreatedName];
-    if (shadowRootCreated) {
-      shadowRootCreated.call(inElement, shadow);
-    }
   }
   return shadow;
 };

@@ -35,7 +35,7 @@ var unShadow = {
     var shadowRoot = inInstance.shadowRoot;
     if (shadowRoot) {
       // create mutable shadowDom
-      var dom = shadowRoot.content.cloneNode(true);
+      var dom = shadowRoot.content;
       // build a immutable list of template <content> elements
       var c$ = [];
       $$(dom, "content").forEach(function(content) {
