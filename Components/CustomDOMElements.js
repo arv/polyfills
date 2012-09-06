@@ -137,7 +137,7 @@ var generateConstructor = function(inDefinition) {
   // 4.b.2. Let CONSTRUCTOR be that function object
   var constructor = function() {
     var element = instantiate(inDefinition.prototype);
-    finalize(element, inDefinition.prototype);
+    finalize(element, inDefinition);
     return element;
   };
   // TODO(sjmiles): OFF SPEC: flag this constructor so we can identify it
