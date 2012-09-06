@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<x-element>
+  <span>SPAN</span><div>DIV</div>
+</x-element>
+
+<hr />
+
+<x-compose>
+  <span>SPAN</span><div>DIV</div>
+</x-compose>
+
+<script>
+    var XElementTemplate = 'x-element content: <content select="div"></content>';
+    var XComposeTemplate = 
+      'x-compose content: <x-element2><content></content><x-element2>';
+      
+    // expand x-element
+    var xe = document.querySelector("x-element");
+    var xes = new WebKitShadowRoot(xe);
+    xes.innerHTML = XElementTemplate;
+
+    // expand x-compose
+    var xc = document.querySelector("x-compose");
+    var xcs = new WebKitShadowRoot(xc);
+    xcs.innerHTML = XComposeTemplate;
+      // expand x-element2
+      var xe2 = xcs.querySelector("x-element2");
+      var xe2s = new WebKitShadowRoot(xe2);
+      xe2s.innerHTML = XElementTemplate;
+
+</script>

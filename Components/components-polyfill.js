@@ -1,6 +1,6 @@
 /*
  * Copyright 2012 The Toolkitchen Authors. All rights reserved.
- * Use of this source code is goverened by a BSD-style
+ * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
 
@@ -11,6 +11,7 @@ scope = scope || {};
 // NOTE: use attributes on the script tag for this file as directives
 
 // export="[name]"		exports polyfill scope into window as 'name'
+// shimShadow         use shim version of ShadowDom (otherwise native)
 
 // NOTE: uses 'window' and 'document' globals
 
@@ -34,17 +35,22 @@ var source, base = "";
   };
 })();
 
-var flags = scope.flags = {
-  exportAs: source.getAttribute("export")
-};
-
+var flags = {};
+for (var i=0, a; (a = source.attributes[i]); i++) {
+  flags[a.name] = a.value || true;
+}
 console.log(flags);
 
-if (flags.exportAs) {
-  window[flags.exportAs] = scope;
-}
+// support exportas directive
 
+if (flags.exportas) {
+  window[flags.exportas] = scope;
+}
 window.__exported_components_polyfill_scope__ = scope;
+
+// module exports
+
+scope.flags = flags;
 
 var require = function(inSrc) {
   document.write('<script src="' + base + inSrc + '"></script>');
@@ -52,10 +58,15 @@ var require = function(inSrc) {
 
 [
   "lib/lang.js",
+  "ShadowDom/WebkitShadowDom.js",
+  "ShadowDom/ShimShadowDom.js",
+  "ShadowDom/UnShadowDom.js",
+  "ShadowDom/ShadowDom.js",
   "ComponentDocuments/path.js",
   "ComponentDocuments/loader.js",
   "ComponentDocuments/parser.js",
   "CustomDOMElements.js",
+  "HTMLElementElement.js",
   "boot.js"
 ].forEach(require);
 
