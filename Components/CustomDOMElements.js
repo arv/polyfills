@@ -245,11 +245,12 @@ var upgradeElement = function(inElement, inDefinition) {
     if (inElement.__upgraded__) {
       return;
     }
-    inElement.__upgraded__ = true;
   }
   // 6.b.2.3. Let UPGRADE be the result of running custom element
   // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
   var upgrade = instantiate(inDefinition.prototype);
+  // do not re-upgrade
+  upgrade.__upgraded__ = true;
   // TODO(sjmiles): OFF SPEC: attach 'is' attribute
   upgrade.setAttribute("is", inDefinition.name);
   // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
