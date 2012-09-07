@@ -264,6 +264,7 @@ var upgradeElement = function(inElement, inDefinition) {
   // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
   // attribute set to true.
   // TODO(sjmiles): implement elementupgrade event
+  return upgrade;
 };
 
 var upgradeElements = function(inTree, inDefinition) {
