@@ -25,18 +25,18 @@ var unShadow = {
     return inInstance;
   },
   installDom: function(inInstance) {
-    // create a source we can extract nodes from
+    // source nodes to distribute
     var source = inInstance;
-    // target for installation
+    // target for distribution
     var target = inInstance;
-    // get all shadow roots
-    var shadowRoots = target.querySelectorAll("shadow-root");
     // shadow dom
     var shadowRoot = inInstance.shadowRoot;
     if (shadowRoot) {
-      // create mutable shadowDom
+      // shadowDom 
       var dom = shadowRoot.content;
-      // build a immutable list of template <content> elements
+      // projections array
+      var projections = [];
+      // build an immutable list of template <content> elements
       var c$ = [];
       $$(dom, "content").forEach(function(content) {
         c$.push(content)
@@ -53,6 +53,7 @@ var unShadow = {
             i++;
           } else {
             frag.appendChild(n);
+            projections.push(n);
           }
         }
         // replace the content node with the fragment
@@ -62,17 +63,30 @@ var unShadow = {
       dom = document.createDocumentFragment();
       for (var n; (n=source.childNodes[0]);) {
         dom.appendChild(n);
+        projections.push(n);
       }
     }
-    // install constructed dom
-    target.textContent = '';
+    //
     if (scope.flags.showshadow) {
       // for visualizing shadow roots only
+      // cache all shadow roots
+      var shadowRoots = target.querySelectorAll("shadow-root");
+    }
+    //
+    // we want to replace any existing content
+    target.textContent = '';
+    //
+    if (scope.flags.showshadow) {
+      // for visualizing shadow roots only
+      // restore shadow roots
       for (i=0, n; n=shadowRoots[i]; i++) {
         target.appendChild(n);
       }
     }
+    //
+    // install constructed dom
     target.appendChild(dom);
+    target.distributedNodes = projections;
   },
   observe: function(inInstance, inDecl) {
     var contentChanges = function() {
