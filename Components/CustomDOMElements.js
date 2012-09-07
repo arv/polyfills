@@ -19,14 +19,14 @@ var registry = {
 
 // SECTION 4
 
-var instantiate = function(inPrototype/*, inTemplate, inLifecycle*/) {
+var instantiate = function(inPrototype) {
   // 4.a.1. Create a new object that implements PROTOTYPE
   // 4.a.2. Let ELEMENT by this new object
   //
   // the custom element instantiation algorithm must also ensure that the
   // output is a valid DOM element with the proper wrapper in place.
   //
-  var element = document.createElement(inPrototype.is);
+  var element = domCreateElement(inPrototype.is);
   element.__proto__ = inPrototype;
   //
   // OUTPUT
@@ -393,5 +393,14 @@ scope.CustomDOMElements = {
 // new public API
 
 document.register = register;
+
+// rewrite public API
+
+var domCreateElement = document.createElement.bind(document);
+
+document.createElement = function(inTagName) {
+  var def = registry[inTagName];
+  return def ? upgradeElement(null, def) : domCreateElement(inTagName);
+}
 
 })(window.__exported_components_polyfill_scope__);
