@@ -239,41 +239,40 @@ var transplantNode = function(upgrade, element) {
   element.parentNode.replaceChild(upgrade, element);
 };
 
+var upgradeElement = function(inElement, inDefinition) {
+  // do not re-upgrade
+  if (inElement) {
+    if (inElement.__upgraded__) {
+      return;
+    }
+    inElement.__upgraded__ = true;
+  }
+  // 6.b.2.3. Let UPGRADE be the result of running custom element
+  // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
+  var upgrade = instantiate(inDefinition.prototype);
+  // TODO(sjmiles): OFF SPEC: attach 'is' attribute
+  upgrade.setAttribute("is", inDefinition.name);
+  // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
+  if (inElement) {
+    transplantNode(upgrade, inElement);
+  }
+  // compute redistributions
+  finalize(upgrade, inDefinition);
+  // we need to upgrade any custom elements that appeared
+  // as a result of this upgrade
+  upgradeAll(upgrade);
+  // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
+  // attribute set to true.
+  // TODO(sjmiles): implement elementupgrade event
+};
+
 var upgradeElements = function(inTree, inDefinition) {
   // 6.b.1 Let NAME be the custom element name part of DEFINITION
   var name = inDefinition.name;
   // 6.b.2 For each element ELEMENT in TREE whose custom element name is NAME:
   var elements = inTree.querySelectorAll(name);
   for (var i=0, element; element=elements[i]; i++) {
-    // do not re-upgrade
-    if (element.__upgraded__) {
-      return;
-    }
-    element.__upgraded__ = true;
-    //
-    // 6.b.2.3. Let UPGRADE be the result of running custom element
-    // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
-    var upgrade = instantiate(inDefinition.prototype, inDefinition.template,
-      inDefinition.lifecycle);
-    //
-    // TODO(sjmiles): OFF SPEC: attach 'is' attribute
-    upgrade.setAttribute("is", inDefinition.name);
-    //
-    // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
-    transplantNode(upgrade, element);
-    //element.parentNode.replaceChild(upgrade, element);
-    //
-    // compute redistributions
-    //
-    finalize(upgrade, inDefinition);
-    //
-    // we need to upgrade any custom elements that appeared
-    // as a result of this upgrade
-    upgradeAll(upgrade);
-    //
-    // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
-    // attribute set to true.
-    // TODO(sjmiles): implement elementupgrade event
+    upgradeElement(element, inDefinition);
   }
 };
 
