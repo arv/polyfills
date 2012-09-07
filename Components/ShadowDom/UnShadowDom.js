@@ -41,6 +41,14 @@ var unShadow = {
       $$(dom, "content").forEach(function(content) {
         c$.push(content)
       });
+      // find content elements *inside* of template elements
+      $$(dom, "template").forEach(function(template) {
+        $$(template.content, "content").forEach(function(content) {
+          c$.push(content)
+        });
+      });
+      // protect MDV template iterators
+      //preprocessTemplates(source);
       // replace each <content> element with matching content
       c$.forEach(function(content) {
         // build a fragment to contain selected nodes
@@ -87,6 +95,9 @@ var unShadow = {
     // install constructed dom
     target.appendChild(dom);
     target.distributedNodes = projections;
+    //
+    // protect MDV template iterators
+    postprocessTemplates(target);
   },
   observe: function(inInstance, inDecl) {
     var contentChanges = function() {
@@ -98,34 +109,35 @@ var unShadow = {
       childList: true,
       subtree: true
     });
-  }/*,
-  renderShadows: function(inDom, inDecl) {
-    // if this template dom has a <shadow> node
-    var shadow = $(inDom, "shadow");
-    if (shadow) {
-      // fetch the shadow dom that would be rendered
-      // by my ancestors (recusively)
-      var srcShadow = unShadow.fetchShadow(inDecl.ancestor);
-      if (srcShadow) {
-        shadow.parentNode.replaceChild(srcShadow, shadow);
-      }
-    }
-    return inDom;
-  },
-  fetchShadow: function(inDecl) {
-    // find ancestor template
-    var d = inDecl;
-    while (d && !d.shadow) {
-      d = d.ancestor;
-    }
-    // now render any ancestor shadow DOM (recurse)
-    return d && unShadow.renderShadows(d.shadow, d);
   }
-  */
+};
+
+var morphAttr = function(inNode, inBefore, inAfter) {
+  if (inNode.hasAttribute(inBefore)) {
+    var v = inNode.getAttribute(inBefore);
+    inNode.setAttribute(inBefore, "null");
+    inNode.removeAttribute(inBefore);
+    inNode.setAttribute(inAfter, v);
+  }
+};
+
+var preprocessTemplates = function(inNode) {
+  $$(inNode, "template").forEach(function(t) {
+    morphAttr(t, "iterate", "x-iterate");
+  });
+};
+
+var postprocessTemplates = function(inNode) {
+  $$(inNode, "template").forEach(function(t) {
+    morphAttr(t, "x-iterate", "iterate");
+    morphAttr(t, "x-instantiate", "instantiate");
+  });
 };
 
 var isTemplate = function(inNode) {
-	return (inNode.tagName == "TEMPLATE");
+  return false;
+	return (inNode.tagName == "TEMPLATE") && 
+    (inNode.hasAttribute("instantiate") || inNode.hasAttribute("iterate"));
 };
 
 var isShadowRoot = function(inNode) {
