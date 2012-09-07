@@ -47,8 +47,6 @@ var unShadow = {
           c$.push(content)
         });
       });
-      // protect MDV template iterators
-      //preprocessTemplates(source);
       // replace each <content> element with matching content
       c$.forEach(function(content) {
         // build a fragment to contain selected nodes
@@ -119,12 +117,6 @@ var morphAttr = function(inNode, inBefore, inAfter) {
     inNode.removeAttribute(inBefore);
     inNode.setAttribute(inAfter, v);
   }
-};
-
-var preprocessTemplates = function(inNode) {
-  $$(inNode, "template").forEach(function(t) {
-    morphAttr(t, "iterate", "x-iterate");
-  });
 };
 
 var postprocessTemplates = function(inNode) {
