@@ -67,6 +67,8 @@ HTMLElementElement.prototype = {
     elementParser.adjustTemplateCssPaths(element, this.template);
     // load component stylesheets
     elementParser.sheets(element, this.template);
+    // ensure all style tags are scoped.
+    elementParser.scopeStyles(element, this.template);
     // apply @host styles.
     elementParser.applyHostStyles(this.template, this.name);
     //
@@ -180,6 +182,13 @@ elementParser = {
         template.content.appendChild(style);
       }
       console.groupEnd();
+    }
+  },
+  scopeStyles: function(element, template) {
+    if (template) {
+      forEach($$(template.content, "style"), function(s) {
+        s.setAttribute("scoped", "");
+      });
     }
   },
   hostRe:/(@host[^{]*)({[^{]*})/gim,
