@@ -241,10 +241,8 @@ var transplantNode = function(upgrade, element) {
 
 var upgradeElement = function(inElement, inDefinition) {
   // do not re-upgrade
-  if (inElement) {
-    if (inElement.__upgraded__) {
-      return;
-    }
+  if (inElement && inElement.__upgraded__) {
+     return inElement;
   }
   // 6.b.2.3. Let UPGRADE be the result of running custom element
   // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
