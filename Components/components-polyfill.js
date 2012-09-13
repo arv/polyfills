@@ -61,6 +61,7 @@ var require = function(inSrc) {
   "ShadowDom/WebkitShadowDom.js",
   "ShadowDom/ShimShadowDom.js",
   "ShadowDom/UnShadowDom.js",
+  "ShadowDom/Projection.js",
   "ShadowDom/ShadowDom.js",
   "ComponentDocuments/path.js",
   "ComponentDocuments/loader.js",

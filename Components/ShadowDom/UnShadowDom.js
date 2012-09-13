@@ -5,7 +5,7 @@ scope = scope || {};
 var unShadow = {
   createShadowDom: function(inInstance, inContent) {
     // memoize lightDom (sort of)
-    inInstance.lightDom = inInstance;
+    //inInstance.lightDom = inInstance;
     // create shadowRoot
     var shadowRoot = document.createElement("shadow-root");
     shadowRoot.style.cssText = "display: none;";
@@ -96,7 +96,7 @@ var unShadow = {
     //
     // protect MDV template iterators
     postprocessTemplates(target);
-  },
+  }/*,
   observe: function(inInstance, inDecl) {
     var contentChanges = function() {
       unShadow.installDom(inInstance);
@@ -107,7 +107,7 @@ var unShadow = {
       childList: true,
       subtree: true
     });
-  }
+  }*/
 };
 
 var morphAttr = function(inNode, inBefore, inAfter) {
