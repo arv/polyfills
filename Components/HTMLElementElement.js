@@ -238,13 +238,37 @@ var elementParser = {
 
 var elementUpgrader = {
   initialize: function() {
+    this.cacheMdvBindings();
     this._upgradeElements = CustomDOMElements.upgradeElements;
     CustomDOMElements.upgradeElements = nop;
   },
   go: function() {
     CustomDOMElements.upgradeElements = this._upgradeElements;
     CustomDOMElements.upgradeAll(document);
+    this.removeMdvBindingsCache();
     CustomDOMElements.watchDom();
+  },
+  cacheMdvBindings: function() {
+    var mdvRe = /^(\{\{)(.*)(\}\}$)/;
+    forEach($$(document, 'template'), function(t) {
+      forEach($$(t.content, '*'), function(n) {
+        forEach(n.attributes, function(a) {
+          var bindings=[];
+          var matches = a.value.match(mdvRe);
+          if (matches) {
+            bindings.push(a.name + '|=|' + matches[2]);
+          }
+          if (bindings.length) {
+            n.setAttribute('x-bindings', bindings.join('|&|'));
+          }
+        });
+      });
+    });
+  },
+  removeMdvBindingsCache: function() {
+    forEach($$(document, '*'), function(n) {
+      n.removeAttribute('x-bindings');
+    });
   }
 };
 
