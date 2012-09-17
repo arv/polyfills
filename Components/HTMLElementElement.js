@@ -133,7 +133,7 @@ HTMLElementElement.prototype = {
   }
 };
 
-elementParser = {
+var elementParser = {
   parse: function(element) {
     new HTMLElementElement(element);
   },
@@ -230,14 +230,27 @@ elementParser = {
       h.appendChild(s);
     }
     if (scope.flags.unshadow) {
-      s.innerHTML = "style { display: none !important; }\n";
+      s.innerHTML = 'style { display: none !important; }\n';
     }
     this.hostSheet = s;
+  }
+};
+
+var elementUpgrader = {
+  initialize: function() {
+    this._upgradeElements = CustomDOMElements.upgradeElements;
+    CustomDOMElements.upgradeElements = nop;
+  },
+  go: function() {
+    CustomDOMElements.upgradeElements = this._upgradeElements;
+    CustomDOMElements.upgradeAll(document);
+    CustomDOMElements.watchDom();
   }
 };
 
 // exports
 
 scope.CustomDOMElements.elementParser = elementParser;
+scope.CustomDOMElements.elementUpgrader = elementUpgrader;
 
 })(window.__exported_components_polyfill_scope__);
