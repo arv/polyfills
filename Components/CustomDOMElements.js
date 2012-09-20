@@ -225,6 +225,10 @@ var transplantNode = function(upgrade, element) {
   upgrade.model = element.model;
   forEach(element.attributes, function(a) {
     upgrade.setAttribute(a.name, a.value);
+    // if there is an mdv attribute binding, add it to the upgraded element
+    if (a.bindingText) {
+      upgrade.addBinding(a.name, a.bindingText);
+    }
   });
   var n$ = [];
   forEach(element.childNodes, function(n) {
@@ -241,23 +245,7 @@ var transplantNode = function(upgrade, element) {
   });
   //
   element.parentNode.replaceChild(upgrade, element);
-  upgradeMdv(upgrade, element);
 };
-
-// To allow dynamic bindings in upgraded elements process x-bindings
-// attribute, which is in the form: "attr1|=|value1|&|attr2|=|value2"
-var upgradeMdv = function(upgrade, element) {
-  //upgrade.model = element.model;
-  if (upgrade.hasAttribute('x-bindings')) {
-    var bindings = upgrade.getAttribute('x-bindings');
-    forEach(bindings.split('|&|'), function(b) {
-      var parts = b.split('|=|');
-      var name = parts[0], binding = '{{' + parts[1] + '}}';
-      //console.log("addBinding", upgrade, name, binding);
-      upgrade.addBinding(name, binding);
-    });
-  }
-}
 
 var upgradeElement = function(inElement, inDefinition) {
   // do not re-upgrade
