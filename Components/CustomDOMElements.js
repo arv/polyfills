@@ -280,7 +280,12 @@ var upgradeElements = function(inTree, inDefinition) {
   // 6.b.2 For each element ELEMENT in TREE whose custom element name is NAME:
   var elements = inTree.querySelectorAll(name);
   for (var i=0, element; element=elements[i]; i++) {
-    upgradeElement(element, inDefinition);
+    // when an element is upgraded, its children are upgraded. This makes
+    // stale elements in this list that are children of components. Avoid
+    // trying to upgrading them by checking if they have a parentNode.
+    if (element.parentNode) {
+      upgradeElement(element, inDefinition);
+    }
   }
 };
 
@@ -295,7 +300,7 @@ var	upgradeAll = function(inNode) {
 // polyfill UA parsing HTML by watching dom for changes via mutations observer
 // and upgrading if any are detected.
 var watchDom = function() {
-	var observer = new WebKitMutationObserver(function(mutations) {
+  var observer = new WebKitMutationObserver(function(mutations) {
 		mutations.forEach(function(mxn){
 			if (mxn.addedNodes.length) {
 				upgradeAll(document);
