@@ -6,6 +6,10 @@
 
 suite('Shadow DOM', function() {
 
+  function getVisualInnerHtml(el) {
+    return HTMLElement_prototype.innerHTML.get.call(el);
+  }
+
   function normalizeInnerHtml(s) {
     // IE9 - Even though the attribute name is stored as "checked" innerHTML
     // upper case the name.
@@ -30,7 +34,7 @@ suite('Shadow DOM', function() {
 
       render(host);
 
-      expect(normalizeInnerHtml(host.innerHTML)).to.be(
+      expect(normalizeInnerHtml(getVisualInnerHtml(host))).to.be(
           normalizeInnerHtml(expectedOuterHtml));
     });
   }
@@ -235,7 +239,7 @@ suite('Shadow DOM', function() {
 
       render(host);
 
-      expect(host.innerHTML).to.be('1<a>234</a>5');
+      expect(getVisualInnerHtml(host)).to.be('1<a>234</a>5');
     });
 
     test('Shadow DOM has a shadow host', function() {
@@ -252,7 +256,7 @@ suite('Shadow DOM', function() {
 
       render(host);
 
-      expect(host.innerHTML).to.be('1<a>234</a>567');
+      expect(getVisualInnerHtml(host)).to.be('1<a>234</a>567');
     });
 
   });
