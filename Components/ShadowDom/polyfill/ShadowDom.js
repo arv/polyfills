@@ -43,6 +43,9 @@ var matches = function(inNode, inSlctr) {
   if (inSlctr[0] == '#') {
     return inNode.id == inSlctr.slice(1);
   }
+  if (inSlctr == '*') {
+    return inNode.nodeName != '#text';
+  }
   return (inNode.tagName == inSlctr.toUpperCase());
 };
 
