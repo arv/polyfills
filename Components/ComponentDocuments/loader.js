@@ -18,6 +18,7 @@ var path = scope.ComponentDocuments.path;
 
 // TODO(sjmiles): these implementations are ad-hoc, and have minimal error
 // checking
+// 
 // There is no spec yet, but there is this:
 // http://lists.w3.org/Archives/Public/public-webapps/2012JulSep/0587.html
 

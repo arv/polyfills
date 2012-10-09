@@ -3,12 +3,18 @@
 <head>
   <title></title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <script src="../../../Components/components-polyfill.js" exportas="components" unShadow></script>
+  <script src="../../../components-polyfill.js" exportas="components" shimshadow></script>
   <style>
     shadow-root {
       color: silver !important;
       background-color: white !important;
       border: 1px dotted silver !important;
+    }
+    x-subelement, x-element {
+      display: block;
+      border: 1px dotted lightblue;
+      padding: 8px;
+      margin: 8px;
     }
   </style>
 </head>
@@ -35,7 +41,7 @@
     //
     var proto = components.CustomDOMElements.generatePrototype("div", {
       orangate: function() {
-        this.style.background = "orange";
+        this.style.color = "orange";
       }
     });
     //

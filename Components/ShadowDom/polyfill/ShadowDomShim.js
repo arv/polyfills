@@ -2,18 +2,20 @@
 
 scope = scope || {};
 
-scope.webkitShadowImpl = {
+scope.shimShadowImpl = {
   createShadowDom: function(inInstance, inContents) {
-    var shadowRoot = new WebKitShadowRoot(inInstance);
+    if (!inInstance.lightDom) {
+      new LightDom(inInstance);
+    }
+    var shadowRoot = new ShadowDom(inInstance, inContents);
     // TODO(sjmiles): check spec: .host not set automatically
     if (!shadowRoot.host) {
       shadowRoot.host = inInstance;
     }
-    inInstance.shadow = inContents;
-    shadowRoot.appendChild(inContents);
     return shadowRoot;
   },
-  installDom: function() {
+  installDom: function(inNode) {
+    inNode.distribute();
   }
 };
 
