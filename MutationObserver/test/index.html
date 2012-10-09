@@ -11,27 +11,61 @@ license that can be found in the LICENSE file.
 <script src="../../ShadowDOM/sidetable.js"></script>
 <script src="../MutationObserver.js"></script>
 
-<script>mocha.setup('tdd')</script>
+<script>mocha.setup({
+  ui: 'tdd',
+  ignoreLeaks: true
+})</script>
 <script>
 
 function expectRecord(record, expected) {
   expect(record.type).to.be(expected.type === undefined ? null : expected.type);
-  expect(record.target).to.be(expected.target === undefined ? null : expected.target);
-  // expect(record.addedNodes).to.be(expected.addedNodes === undefined ? null : expected.addedNodes);
-  // expect(record.removedNodes).to.be(expected.removedNodes === undefined ? null : expected.removedNodes);
-  expect(record.previousSibling).to.be(expected.previousSibling === undefined ? null : expected.previousSibling);
-  expect(record.nextSibling).to.be(expected.nextSibling === undefined ? null : expected.nextSibling);
-  expect(record.attributeName).to.be(expected.attributeName === undefined ? null : expected.attributeName);
-  expect(record.attributeNamespace).to.be(expected.attributeNamespace === undefined ? null : expected.attributeNamespace);
-  expect(record.oldValue).to.be(expected.oldValue === undefined ? null : expected.oldValue);
+  expect(record.target).to.be(
+      expected.target === undefined ? null : expected.target);
+
+  // addedNodes/removedNodes are broken in both WebKit and Gecko
+  // (inconsistently).
+  // https://bugs.webkit.org/show_bug.cgi?id=98921
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=800013
+
+  if (expected.addedNodes == null) {
+    if (record.addedNodes !== null && record.addedNodes.length !== 0)
+      expect().fail('Expected addedNodes to be null, it was: ' +
+                    record.addedNodes);
+  } else {
+    expect([].slice.call(record.addedNodes)).to.eql(expected.addedNodes);
+  }
+
+  if (expected.removedNodes == null) {
+    if (record.removedNodes !== null && record.removedNodes.length !== 0)
+      expect().fail('Expected removedNodes to be null, it was: ' +
+                    record.removedNodes);
+  } else {
+    expect([].slice.call(record.removedNodes)).to.eql(expected.removedNodes);
+  }
+
+  expect(record.previousSibling).to.be(
+      expected.previousSibling === undefined ? null : expected.previousSibling);
+  expect(record.nextSibling).to.be(
+      expected.nextSibling === undefined ? null : expected.nextSibling);
+  expect(record.attributeName).to.be(
+      expected.attributeName === undefined ? null : expected.attributeName);
+  expect(record.attributeNamespace).to.be(
+      expected.attributeNamespace === undefined ?
+          null : expected.attributeNamespace);
+  expect(record.oldValue).to.be(
+      expected.oldValue === undefined ? null : expected.oldValue);
 }
 
-if (/native/.test(location.search))
+var useNativeMutationObserver = /native/.test(location.search);
+
+if (useNativeMutationObserver)
   JsMutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
 </script>
+
 <script src="attributes.js"></script>
 <script src="characterData.js"></script>
+<script src="childList.js"></script>
 <script src="mixed.js"></script>
 <script src="callback.js"></script>
 <div id="mocha"></div>
