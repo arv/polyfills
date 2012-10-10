@@ -101,9 +101,9 @@ HTMLElementElement.prototype = {
     elementParser.scripts(element, this);
     //
     // now we have the user supplied prototype and lifecycle
-    console.log("registering", this.name);
-    console.log(this.generatedConstructor.prototype);
-    console.log(this.lifecycleImpl);
+    //console.log("registering", this.name);
+    //console.log(this.generatedConstructor.prototype);
+    //console.log(this.lifecycleImpl);
     //
     // we need to reprocess the prototype (cheating because
     // prototype is not a property defintion object as called for
@@ -171,20 +171,20 @@ var elementParser = {
   sheets: function(element, template) {
     var sheet = [];
     if (template) {
-      console.group("sheets");
+      //console.group("sheets");
       forEach($$(element, "link[rel=stylesheet]"), function(s) {
         var styles = componentLoader.fetch(s);
         styles = path.makeCssUrlsRelative(styles, path.nodeUrl(s));
         sheet.push(styles);
       });
       if (sheet.length) {
-        console.log("sheets found (", sheet.length, "), injecting");
+        //console.log("sheets found (", sheet.length, "), injecting");
         var style = document.createElement("style");
         style.style.display = "none !important;";
         style.innerHTML = sheet.join('');
         template.content.appendChild(style);
       }
-      console.groupEnd();
+      //console.groupEnd();
     }
   },
   scopeStyles: function(element, template) {
