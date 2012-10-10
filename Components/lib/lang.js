@@ -6,9 +6,8 @@
 
 function nop() {};
 
-// Old versions of iOS does not have bind.
+// Old versions of iOS do not have bind.
 if (!Function.prototype.bind) {
-  //console.warn('Patching Function.prototype.bind');
   Function.prototype.bind = function(scope) {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 1);
