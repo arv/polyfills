@@ -45,6 +45,8 @@ HTMLElementElement = function(inElement) {
   this.constructorName = inElement.getAttribute("constructor");
   this.extendsName = inElement.getAttribute("extends") || "div";
   this.template = inElement.querySelector("template");
+  // TODO(sjmiles): ad hoc polyfill for <template> element
+  this.template = elementParser.normalizeTemplate(this.template);
   this.generatedConstructor = function() {
     return this.instantiate();
   }
