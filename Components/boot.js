@@ -12,16 +12,18 @@ scope = scope || {};
 
 var componentLoader = scope.ComponentDocuments.loader.componentLoader;
 var documentParser = scope.ComponentDocuments.parser;
-var elementParser = scope.CustomDOMElements.elementParser
+var elementParser = scope.CustomDOMElements.elementParser;
+var elementUpgrader = scope.CustomDOMElements.elementUpgrader;
 
 // 
 // NOTE: uses 'window' and 'document' globals
 
 scope.ready = function() {
   elementParser.createHostSheet();
+  elementUpgrader.initialize();
   componentLoader.preload(document, function() {
     documentParser.parse(document, elementParser.parse);
-    //scope.declarationFactory.morphAll(document);
+    elementUpgrader.go();
     scope.webComponentsReady(); 
   });
 };

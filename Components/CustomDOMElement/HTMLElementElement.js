@@ -40,6 +40,7 @@ window.componentScript = function(inName, inFunc) {
 // Custom DOM Elements SECTION 7.2
 
 HTMLElementElement = function(inElement) {
+  this.element = inElement;
   this.name = inElement.getAttribute("name");
   this.constructorName = inElement.getAttribute("constructor");
   this.extendsName = inElement.getAttribute("extends") || "div";
@@ -67,6 +68,8 @@ HTMLElementElement.prototype = {
     elementParser.adjustTemplateCssPaths(element, this.template);
     // load component stylesheets
     elementParser.sheets(element, this.template);
+    // ensure all style tags are scoped.
+    elementParser.scopeStyles(element, this.template);
     // apply @host styles.
     elementParser.applyHostStyles(this.template, this.name);
     //
@@ -131,7 +134,7 @@ HTMLElementElement.prototype = {
   }
 };
 
-elementParser = {
+var elementParser = {
   parse: function(element) {
     new HTMLElementElement(element);
   },
@@ -182,6 +185,13 @@ elementParser = {
       console.groupEnd();
     }
   },
+  scopeStyles: function(element, template) {
+    if (template) {
+      forEach($$(template.content, "style"), function(s) {
+        s.setAttribute("scoped", "");
+      });
+    }
+  },
   hostRe:/(@host[^{]*)({[^{]*})/gim,
   applyHostStyles: function(template, name) {
     // strategy: apply a rule for each @host rule with @host replaced with
@@ -220,12 +230,28 @@ elementParser = {
     } else {
       h.appendChild(s);
     }
+    if (scope.flags.unshadow) {
+      s.innerHTML = 'style { display: none !important; }\n';
+    }
     this.hostSheet = s;
+  }
+};
+
+var elementUpgrader = {
+  initialize: function() {
+    this._upgradeElements = CustomDOMElements.upgradeElements;
+    CustomDOMElements.upgradeElements = nop;
+  },
+  go: function() {
+    CustomDOMElements.upgradeElements = this._upgradeElements;
+    CustomDOMElements.upgradeAll(document);
+    CustomDOMElements.watchDom();
   }
 };
 
 // exports
 
 scope.CustomDOMElements.elementParser = elementParser;
+scope.CustomDOMElements.elementUpgrader = elementUpgrader;
 
 })(window.__exported_components_polyfill_scope__);

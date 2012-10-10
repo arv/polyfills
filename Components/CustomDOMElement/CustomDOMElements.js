@@ -59,6 +59,9 @@ var finalize = function(inElement, inDefinition) {
     // create shadow dom, cache the root
     shadows.push(createShadowDom(inElement, definition));
   });
+  // upgrade elements before doing shadow dom so that any references created
+  // during distribution do not become stale.
+  upgradeAll(inElement);
   //
   // do shadow dom distribution (for shims that do this imperatively)
   if (inDefinition.template) {
@@ -134,7 +137,7 @@ var observeAttributeChanges = function(inElement, inDefinition) {
       });
     });
     //
-    console.log("attaching mutation observer to ", inElement)
+    //console.log("attaching mutation observer to ", inElement)
     observer.observe(inElement, {
       attributes: true,
       attributeOldValue: true
@@ -219,8 +222,13 @@ var generatePrototype = function(inExtends, inProperties) {
 };
 
 var transplantNode = function(upgrade, element) {
+  upgrade.model = element.model;
   forEach(element.attributes, function(a) {
     upgrade.setAttribute(a.name, a.value);
+    // if there is an mdv attribute binding, add it to the upgraded element
+    if (a.bindingText) {
+      upgrade.addBinding(a.name, a.bindingText);
+    }
   });
   var n$ = [];
   forEach(element.childNodes, function(n) {
@@ -241,19 +249,17 @@ var transplantNode = function(upgrade, element) {
 
 var upgradeElement = function(inElement, inDefinition) {
   // do not re-upgrade
-  if (inElement) {
-    if (inElement.__upgraded__) {
-      return;
-    }
+  if (inElement && inElement.__upgraded__) {
+     return inElement;
   }
-  // 6.b.2.3. Let UPGRADE be the result of running custom element
+  // 5.b.2.3. Let UPGRADE be the result of running custom element
   // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
   var upgrade = instantiate(inDefinition.prototype);
   // do not re-upgrade
   upgrade.__upgraded__ = true;
   // TODO(sjmiles): OFF SPEC: attach 'is' attribute
   upgrade.setAttribute("is", inDefinition.name);
-  // 6.b.2.4 Replace ELEMENT with UPGRADE in TREE
+  // 5.b.2.4 Replace ELEMENT with UPGRADE in TREE
   if (inElement) {
     transplantNode(upgrade, inElement);
   }
@@ -262,7 +268,7 @@ var upgradeElement = function(inElement, inDefinition) {
   // we need to upgrade any custom elements that appeared
   // as a result of this upgrade
   upgradeAll(upgrade);
-  // 6.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
+  // 5.b.3 On UPGRADE, fire an event named elementupgrade with its bubbles
   // attribute set to true.
   // TODO(sjmiles): implement elementupgrade event
   return upgrade;
@@ -274,7 +280,12 @@ var upgradeElements = function(inTree, inDefinition) {
   // 6.b.2 For each element ELEMENT in TREE whose custom element name is NAME:
   var elements = inTree.querySelectorAll(name);
   for (var i=0, element; element=elements[i]; i++) {
-    upgradeElement(element, inDefinition);
+    // when an element is upgraded, its children are upgraded. This makes
+    // stale elements in this list that are children of components. Avoid
+    // trying to upgrading them by checking if they have a parentNode.
+    if (element.parentNode) {
+      upgradeElement(element, inDefinition);
+    }
   }
 };
 
@@ -284,10 +295,20 @@ var	upgradeAll = function(inNode) {
 	}
 };
 
-// SECTION 5
+// SECTION 6
 
-// TODO(sjmiles): deals with UA parsing HTML; do we need to polyfill
-// something here?
+// polyfill UA parsing HTML by watching dom for changes via mutations observer
+// and upgrading if any are detected.
+var watchDom = function() {
+  var observer = new WebKitMutationObserver(function(mutations) {
+		mutations.forEach(function(mxn){
+			if (mxn.addedNodes.length) {
+				upgradeAll(document);
+			}
+    });
+  });
+  observer.observe(document.body, {childList: true, subtree: true});
+}
 
 // SECTION 7.1
 
@@ -388,6 +409,7 @@ scope.CustomDOMElements = {
   generatePrototype: generatePrototype,
   upgradeElements: upgradeElements,
   upgradeAll: upgradeAll,
+  watchDom: watchDom,
   validateArguments: validateArguments,
   register: register
 };

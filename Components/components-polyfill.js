@@ -35,10 +35,23 @@ var source, base = "";
   };
 })();
 
+// acquire flags from script tag attributes
+
 var flags = {};
 for (var i=0, a; (a = source.attributes[i]); i++) {
   flags[a.name] = a.value || true;
 }
+
+// acquire flags from url
+
+if (!flags.noOpts) {
+  var opts = location.search.slice(1).split('&');
+  for (var i=0, o; (o = opts[i]); i++) {
+    o = o.split('=');
+    flags[o[0]] = o[1] || true;
+  }
+}
+
 console.log(flags);
 
 // support exportas directive
@@ -58,15 +71,18 @@ var require = function(inSrc) {
 
 [
   "lib/lang.js",
-  "ShadowDom/WebkitShadowDom.js",
-  "ShadowDom/ShimShadowDom.js",
-  "ShadowDom/UnShadowDom.js",
-  "ShadowDom/ShadowDom.js",
+  "ShadowDom/webkit/WebkitShadowDom.js",
+  "ShadowDom/polyfill/LightDom.js",
+  "ShadowDom/polyfill/Changeling.js",
+  "ShadowDom/polyfill/Projection.js",
+  "ShadowDom/polyfill/ShadowDom.js",
+  "ShadowDom/polyfill/ShadowDomShim.js",
+  "ShadowDom/ShadowDomImpl.js",
   "ComponentDocuments/path.js",
   "ComponentDocuments/loader.js",
   "ComponentDocuments/parser.js",
-  "CustomDOMElements.js",
-  "HTMLElementElement.js",
+  "CustomDOMElement/CustomDOMElements.js",
+  "CustomDOMElement/HTMLElementElement.js",
   "boot.js"
 ].forEach(require);
 
