@@ -34,7 +34,7 @@ var isInsertionPoint = function(inNode) {
 
 (function(){
   
-// ShadowDom Query (brain-dead)
+// ShadowDom Query (simplistic)
 
 var matches = function(inNode, inSlctr) {
   if (inSlctr == "~") {
