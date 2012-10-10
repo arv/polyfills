@@ -40,6 +40,7 @@ window.componentScript = function(inName, inFunc) {
 // Custom DOM Elements SECTION 7.2
 
 HTMLElementElement = function(inElement) {
+  this.element = inElement;
   this.name = inElement.getAttribute("name");
   this.constructorName = inElement.getAttribute("constructor");
   this.extendsName = inElement.getAttribute("extends") || "div";
