@@ -33,7 +33,16 @@ var instantiate = function(inPrototype) {
   return element;
 };
 
+var initialize = function(inElement, inDefinition) {
+  inElement.__proto__ = inDefinition.prototype;
+};
+
 var finalize = function(inElement, inDefinition) {
+  // flag to prevent re-upgrades
+  inElement.__upgraded__ = true;
+  // TODO(sjmiles): OFF SPEC: attach 'is' attribute and property
+  inElement.setAttribute("is", inDefinition.name);
+  inElement.is = inDefinition.name;
   //
   // 4.a.3. Let CHAIN be ELEMENT's prototype chain, in reverse order
   // (starting with the most-derived object)
@@ -158,7 +167,7 @@ var generateConstructor = function(inDefinition) {
   };
   // TODO(sjmiles): OFF SPEC: flag this constructor so we can identify it
   // in instantiate above
-  constructor.generated = true;
+  //constructor.generated = true;
   // 4.b.3. Set PROTOTYPE as the prototype property on CONSTRUCTOR
   constructor.prototype = inDefinition.prototype;
   // 4.b.3. Set CONSTRUCTOR as the constructor property on PROTOTYPE.
@@ -221,6 +230,7 @@ var generatePrototype = function(inExtends, inProperties) {
   return prototype;
 };
 
+/*
 var transplantNode = function(upgrade, element) {
   upgrade.model = element.model;
   forEach(element.attributes, function(a) {
@@ -246,6 +256,7 @@ var transplantNode = function(upgrade, element) {
   //
   element.parentNode.replaceChild(upgrade, element);
 };
+*/
 
 var upgradeElement = function(inElement, inDefinition) {
   // do not re-upgrade
@@ -265,12 +276,9 @@ var upgradeElement = function(inElement, inDefinition) {
   // polyfill to upgrade in-place, instead of creating
   // a new element.
   upgrade = inElement;
-  upgrade.__proto__ = inDefinition.prototype;
-  // do not re-upgrade
-  upgrade.__upgraded__ = true;
-  // TODO(sjmiles): OFF SPEC: attach 'is' attribute
-  upgrade.setAttribute("is", inDefinition.name);
-  // compute redistributions
+  initialize(upgrade, inDefinition);
+  //
+  // complete element setup (compute redistributions)
   finalize(upgrade, inDefinition);
   // we need to upgrade any custom elements that appeared
   // as a result of this upgrade
@@ -430,8 +438,10 @@ document.register = register;
 var domCreateElement = document.createElement.bind(document);
 
 document.createElement = function(inTagName) {
+  var elt = domCreateElement(inTagName);
   var def = registry[inTagName];
-  return def ? upgradeElement(null, def) : domCreateElement(inTagName);
+  return def ? upgradeElement(elt, def) : elt;
+  //return def ? upgradeElement(null, def) : domCreateElement(inTagName);
 }
 
 })(window.__exported_components_polyfill_scope__);
