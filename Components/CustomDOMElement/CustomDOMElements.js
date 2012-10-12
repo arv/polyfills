@@ -254,15 +254,22 @@ var upgradeElement = function(inElement, inDefinition) {
   }
   // 5.b.2.3. Let UPGRADE be the result of running custom element
   // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
+  /*
   var upgrade = instantiate(inDefinition.prototype);
-  // do not re-upgrade
-  upgrade.__upgraded__ = true;
-  // TODO(sjmiles): OFF SPEC: attach 'is' attribute
-  upgrade.setAttribute("is", inDefinition.name);
   // 5.b.2.4 Replace ELEMENT with UPGRADE in TREE
   if (inElement) {
     transplantNode(upgrade, inElement);
   }
+  */
+  // TODO(sjmiles): OFFSPEC: it's more convenient for 
+  // polyfill to upgrade in-place, instead of creating
+  // a new element.
+  upgrade = inElement;
+  upgrade.__proto__ = inDefinition.prototype;
+  // do not re-upgrade
+  upgrade.__upgraded__ = true;
+  // TODO(sjmiles): OFF SPEC: attach 'is' attribute
+  upgrade.setAttribute("is", inDefinition.name);
   // compute redistributions
   finalize(upgrade, inDefinition);
   // we need to upgrade any custom elements that appeared

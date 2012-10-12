@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+Copyright 2012 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- -->
+    <script src="lib/lang.js"></script>
+    <script src="lib/dump.js"></script>
+    <!-- -->
+    <script src="../../ShadowDOM/polyfill/LightDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
+    <script src="../../ShadowDOM/polyfill/Projection.js"></script>
+    <script src="../../ShadowDOM/polyfill/ShadowDom.js"></script>
+    <!-- -->
+    <style>
+      div, g-A, g-B {
+        display: block;
+        border: 1px dotted red;
+        margin: 8px;
+        padding: 8px;
+      }
+    </style>
+    <script>
+      change = function() {
+        A = $("g-A");
+        new LightDom(A);
+        new ShadowDom(A, $("template#A").content);
+        // makes g-B visible to $
+        A.distribute();
+        //
+        B = $("g-B");
+        new LightDom(B);
+        new ShadowDom(B, $("template#B").content);
+        A.distribute();
+        //
+        A.lightDom.appendChild(document.createElement('span')).textContent = 
+          'ADDED!!';
+        A.lightDom.appendChild(document.createTextNode()).textContent = 
+          'TEXT!!';
+        A.distribute()
+        //
+        dumper(A);
+        //xinspect(A);
+      }
+    </script>
+  </head>
+  <body onload="change()">
+      <g-A><span id="a1">Where am I?</span></g-A>
+  
+      <template id="A">[A->]<g-B><content></content></g-B>[<-A]</template>
+      <template id="B">[B->][<content></content>][<-B]</template>
+      
+      <hr/>
+      
+      Expected output (also, see console):
+
+      <div>[A-&gt;]
+        <div>[B-&gt;][<span id="a1">Where am I?ADDED!!TEXT!!</span>][&lt;-B]</div>
+      [&lt;-A]</div>
+
+</body>
+</html>

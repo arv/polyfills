@@ -8,13 +8,7 @@ var ShadowDom = function(inNode, inTemplate) {
     // create shadow store
     shadows = inNode.shadows = document.createDocumentFragment();
     // add some API to inInstance
-    inNode.distribute = function() {
-      var root = this.shadows.lastChild;
-      // distribute any lightdom to our shadowDom(s)
-      ShadowDom.distribute(this.lightDom && this.lightDom.childNodes, root);
-      // project composed tree
-      new Projection(inNode).addNodes(root.childNodes);
-    };
+    inNode.distribute = ShadowDom.distribute;
   }
   // stamp our template
   var shadow = inTemplate && inTemplate.cloneNode(true);
@@ -34,6 +28,16 @@ var isInsertionPoint = function(inNode) {
 
 (function(){
   
+ShadowDom.distribute = function() {
+  var pool = this.lightDom && this.lightDom.childNodes;
+  var root = this.shadows.lastChild;
+  // distribute any lightdom to our shadowDom(s)
+  distribute(poolify(pool), root);
+  flatten(root);
+  // project composed tree
+  new Projection(this).addNodes(root.childNodes);
+};
+  
 // ShadowDom Query (simplistic)
 
 var matches = function(inNode, inSlctr) {
@@ -45,6 +49,9 @@ var matches = function(inNode, inSlctr) {
   }
   if (inSlctr == '*') {
     return inNode.nodeName != '#text';
+  }
+  if (inSlctr[0] == '.') {
+    return inNode.classList && inNode.classList.contains(inSlctr.slice(1));
   }
   return (inNode.tagName == inSlctr.toUpperCase());
 };
@@ -74,11 +81,6 @@ ShadowDom.localQueryAll = function(inNode, inSlctr) {
 
 ShadowDom.localQuery = function(inNode, inSlctr) {
   return ShadowDom.localQueryAll(inNode, inSlctr)[0];
-};
-
-ShadowDom.distribute = function(inPool, inRoot) {
-  distribute(poolify(inPool), inRoot);
-  flatten(inRoot);
 };
 
 var poolify = function(inNodes) {
