@@ -40,10 +40,18 @@ ShadowDom.distribute = function() {
   
 // ShadowDom Query (simplistic)
 
+// custom selectors:
+//
+// ~        = any node with lightDom 
+// #<id>    = node with id = <id>
+// *        = any non-Text node
+// .<class> = any node with <class> in it's classList
+// [<attr>] = any node with attribute <attr>
+//
 var matches = function(inNode, inSlctr) {
   if (inSlctr == "~") {
     return Boolean(inNode.lightDom);
-  }
+  } 
   if (inSlctr[0] == '#') {
     return inNode.id == inSlctr.slice(1);
   }
@@ -52,6 +60,9 @@ var matches = function(inNode, inSlctr) {
   }
   if (inSlctr[0] == '.') {
     return inNode.classList && inNode.classList.contains(inSlctr.slice(1));
+  }
+  if (inSlctr[0] == '[') {
+    return inNode.hasAttribute && inNode.hasAttribute(inSlctr.slice(1, -1));
   }
   return (inNode.tagName == inSlctr.toUpperCase());
 };
