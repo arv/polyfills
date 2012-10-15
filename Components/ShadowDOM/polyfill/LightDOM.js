@@ -14,11 +14,11 @@ var moveChildren = function(upgrade, element) {
   });
 };
 
-var LightDom = function(inNode) {
-  var lightDom = document.createDocumentFragment();
-  lightDom.tagName = inNode.tagName;
-  moveChildren(lightDom, inNode);
+var LightDOM = function(inNode) {
+  var lightDOM = document.createDocumentFragment();
+  lightDOM.tagName = inNode.tagName;
+  moveChildren(lightDOM, inNode);
   inNode.textContent = '';
-  inNode.lightDom = lightDom;
-  return lightDom;
+  inNode.lightDOM = lightDOM;
+  return lightDOM;
 };

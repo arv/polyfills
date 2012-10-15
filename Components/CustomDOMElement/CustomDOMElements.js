@@ -10,7 +10,7 @@ scope = scope || {};
 
 // imports
 
-var shadowDomImpl = scope.shadowDomImpl;
+var shadowDOMImpl = scope.shadowDOMImpl;
 
 // custom element definition registry (name: definition)
 
@@ -66,7 +66,7 @@ var finalize = function(inElement, inDefinition) {
   // walk the chain to create shadows
   chain.forEach(function(definition) {
     // create shadow dom, cache the root
-    shadows.push(createShadowDom(inElement, definition));
+    shadows.push(createShadowDOM(inElement, definition));
   });
   // upgrade elements before doing shadow dom so that any references created
   // during distribution do not become stale.
@@ -74,8 +74,8 @@ var finalize = function(inElement, inDefinition) {
   //
   // do shadow dom distribution (for shims that do this imperatively)
   if (inDefinition.template) {
-    // use polymorphic shadowDomImpl
-    shadowDomImpl.installDom(inElement);
+    // use polymorphic shadowDOMImpl
+    shadowDOMImpl.installDOM(inElement);
     // upgrade custom elements that came from templates
     upgradeAll(inElement);
   }
@@ -118,13 +118,13 @@ var getAncestorChain = function(inDefinition) {
   return chain;
 };
 
-var createShadowDom = function(inElement, inDefinition) {
+var createShadowDOM = function(inElement, inDefinition) {
   if (inDefinition.template) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
     //
-    // use polymorphic shadowDomImpl
-    var shadow = shadowDomImpl.createShadowDom(inElement,
+    // use polymorphic shadowDOMImpl
+    var shadow = shadowDOMImpl.createShadowDOM(inElement,
       inDefinition.template.content.cloneNode(true));
   }
   return shadow;
@@ -314,7 +314,7 @@ var	upgradeAll = function(inNode) {
 
 // polyfill UA parsing HTML by watching dom for changes via mutations observer
 // and upgrading if any are detected.
-var watchDom = function() {
+var watchDOM = function() {
   var observer = new WebKitMutationObserver(function(mutations) {
 		mutations.forEach(function(mxn){
 			if (mxn.addedNodes.length) {
@@ -424,7 +424,7 @@ scope.CustomDOMElements = {
   generatePrototype: generatePrototype,
   upgradeElements: upgradeElements,
   upgradeAll: upgradeAll,
-  watchDom: watchDom,
+  watchDOM: watchDOM,
   validateArguments: validateArguments,
   register: register
 };

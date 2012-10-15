@@ -37,10 +37,10 @@ function $$(inElement, inSelector) {
   return nodes;
 }
 
-function createDom(inTagOrNode, inHtml, inAttrs) {
+function createDOM(inTagOrNode, inHTML, inAttrs) {
   var dom = typeof inTagOrNode == 'string' ?
       document.createElement(inTagOrNode) : inTagOrNode.cloneNode(true);
-  dom.innerHTML = inHtml;
+  dom.innerHTML = inHTML;
   if (inAttrs) {
     for (var n in inAttrs) {
       dom.setAttribute(n, inAttrs[n]);

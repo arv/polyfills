@@ -40,9 +40,9 @@ var xhr = {
   }
 };
 
-var makeDocument = function(inHtml, inName) {
+var makeDocument = function(inHTML, inName) {
   var doc = document.implementation.createHTMLDocument();
-  doc.body.innerHTML = inHtml;
+  doc.body.innerHTML = inHTML;
   doc.name = inName;
   return doc;
 };

@@ -11,7 +11,7 @@ scope = scope || {};
 // NOTE: use attributes on the script tag for this file as directives
 
 // export="[name]"		exports polyfill scope into window as 'name'
-// shimShadow         use shim version of ShadowDom (otherwise native)
+// shimShadow         use shim version of ShadowDOM (otherwise native)
 
 // NOTE: uses 'window' and 'document' globals
 
@@ -71,13 +71,13 @@ var require = function(inSrc) {
 
 [
   "lib/lang.js",
-  "ShadowDOM/webkit/WebkitShadowDom.js",
-  "ShadowDOM/polyfill/LightDom.js",
+  "ShadowDOM/webkit/WebkitShadowDOM.js",
+  "ShadowDOM/polyfill/LightDOM.js",
   "ShadowDOM/polyfill/Changeling.js",
   "ShadowDOM/polyfill/Projection.js",
-  "ShadowDOM/polyfill/ShadowDom.js",
-  "ShadowDOM/polyfill/ShadowDomShim.js",
-  "ShadowDOM/ShadowDomImpl.js",
+  "ShadowDOM/polyfill/ShadowDOM.js",
+  "ShadowDOM/polyfill/ShadowDOMShim.js",
+  "ShadowDOM/ShadowDOMImpl.js",
   "ComponentDocuments/path.js",
   "ComponentDocuments/loader.js",
   "ComponentDocuments/parser.js",

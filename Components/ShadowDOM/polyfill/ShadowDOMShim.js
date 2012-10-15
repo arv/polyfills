@@ -3,18 +3,18 @@
 scope = scope || {};
 
 scope.shimShadowImpl = {
-  createShadowDom: function(inInstance, inContents) {
-    if (!inInstance.lightDom) {
-      new LightDom(inInstance);
+  createShadowDOM: function(inInstance, inContents) {
+    if (!inInstance.lightDOM) {
+      new LightDOM(inInstance);
     }
-    var shadowRoot = new ShadowDom(inInstance, inContents);
+    var shadowRoot = new ShadowDOM(inInstance, inContents);
     // TODO(sjmiles): check spec: .host not set automatically
     if (!shadowRoot.host) {
       shadowRoot.host = inInstance;
     }
     return shadowRoot;
   },
-  installDom: function(inNode) {
+  installDOM: function(inNode) {
     inNode.distribute();
   }
 };
