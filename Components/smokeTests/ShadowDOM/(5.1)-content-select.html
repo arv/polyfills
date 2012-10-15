@@ -12,10 +12,10 @@ license that can be found in the LICENSE file.
     <script src="lib/lang.js"></script>
     <script src="lib/dump.js"></script>
     <!-- -->
-    <script src="../../ShadowDOM/polyfill/LightDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/LightDOM.js"></script>
     <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
     <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
     <!-- -->
     <style>
       div, g-A {
@@ -29,8 +29,8 @@ license that can be found in the LICENSE file.
       change = function() {
         A = $("g-A");
         //
-        new LightDom(A);
-        new ShadowDom(A, $("template#A").content);
+        new LightDOM(A);
+        new ShadowDOM(A, $("template#A").content);
         A.distribute();
         //
         dumper(A);

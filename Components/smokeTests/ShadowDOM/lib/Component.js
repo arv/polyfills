@@ -7,10 +7,10 @@ var Component = function(inElement, inDefinition) {
   // track Components for debugging
   c$.push(elt);
   // make lightdom
-  new LightDom(elt);
+  new LightDOM(elt);
   // make shadowdom
   for (var i=0, b; (b=inDefinition.bases[i]); i++) {
-    new ShadowDom(elt, $("template#" + b).content);
+    new ShadowDOM(elt, $("template#" + b).content);
   }
   // mark it upgraded
   elt.is = inDefinition.name;
@@ -38,7 +38,7 @@ Component.prototype = {
     }
   }/*,
   distribute: function() {
-    ShadowDom.distribute(this);
+    ShadowDOM.distribute(this);
   }*/
 };
 

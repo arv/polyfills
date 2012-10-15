@@ -1,4 +1,4 @@
-var ShadowDom = function(inNode, inTemplate) {
+var ShadowDOM = function(inNode, inTemplate) {
   // make a new root
   var root = document.createElement("shadow-root");
   // get shadows store
@@ -8,7 +8,7 @@ var ShadowDom = function(inNode, inTemplate) {
     // create shadow store
     shadows = inNode.shadows = document.createDocumentFragment();
     // add some API to inInstance
-    inNode.distribute = ShadowDom.distribute;
+    inNode.distribute = ShadowDOM.distribute;
   }
   // stamp our template
   var shadow = inTemplate && inTemplate.cloneNode(true);
@@ -28,21 +28,21 @@ var isInsertionPoint = function(inNode) {
 
 (function(){
   
-ShadowDom.distribute = function() {
-  var pool = this.lightDom && this.lightDom.childNodes;
+ShadowDOM.distribute = function() {
+  var pool = this.lightDOM && this.lightDOM.childNodes;
   var root = this.shadows.lastChild;
-  // distribute any lightdom to our shadowDom(s)
+  // distribute any lightdom to our shadowDOM(s)
   distribute(poolify(pool), root);
   flatten(root);
   // project composed tree
   new Projection(this).addNodes(root.childNodes);
 };
   
-// ShadowDom Query (simplistic)
+// ShadowDOM Query (simplistic)
 
 // custom selectors:
 //
-// ~        = any node with lightDom 
+// ~        = any node with lightDOM 
 // #<id>    = node with id = <id>
 // *        = any non-Text node
 // .<class> = any node with <class> in it's classList
@@ -50,7 +50,7 @@ ShadowDom.distribute = function() {
 //
 var matches = function(inNode, inSlctr) {
   if (inSlctr == "~") {
-    return Boolean(inNode.lightDom);
+    return Boolean(inNode.lightDOM);
   } 
   if (inSlctr[0] == '#') {
     return inNode.id == inSlctr.slice(1);
@@ -82,16 +82,16 @@ var search = function(inNodes, inSlctr) {
 };
 
 var _search = function(inNode, inSlctr) {
-  return search((inNode.lightDom && inNode.lightDom.childNodes) || 
+  return search((inNode.lightDOM && inNode.lightDOM.childNodes) || 
     inNode.insertions || inNode.childNodes, inSlctr);
 };
 
-ShadowDom.localQueryAll = function(inNode, inSlctr) {
+ShadowDOM.localQueryAll = function(inNode, inSlctr) {
   return search(inNode.insertions || inNode.childNodes, inSlctr);
 };
 
-ShadowDom.localQuery = function(inNode, inSlctr) {
-  return ShadowDom.localQueryAll(inNode, inSlctr)[0];
+ShadowDOM.localQuery = function(inNode, inSlctr) {
+  return ShadowDOM.localQueryAll(inNode, inSlctr)[0];
 };
 
 var poolify = function(inNodes) {
@@ -145,7 +145,7 @@ var distribute = function(inPool, inRoot) {
   var root = inRoot;
   //
   // distribute pool to <content> nodes
-  var insertions = ShadowDom.localQueryAll(root, "content");
+  var insertions = ShadowDOM.localQueryAll(root, "content");
   insertions.forEach(function(insertion) {
     decorateInsertionPoint(insertion);
     var slctr = insertion.getAttribute("select");
@@ -154,7 +154,7 @@ var distribute = function(inPool, inRoot) {
   });
   //
   // distribute older shadow to <shadow>
-  var shadow = ShadowDom.localQuery(root, "shadow");
+  var shadow = ShadowDOM.localQuery(root, "shadow");
   if (shadow) {
     var olderRoot = root.previousSibling;
     new Projection(shadow).addNodes(olderRoot.childNodes);
@@ -162,7 +162,7 @@ var distribute = function(inPool, inRoot) {
   }
   //
   // distribute any contained objects
-  var comps = ShadowDom.localQueryAll(root, "~");
+  var comps = ShadowDOM.localQueryAll(root, "~");
   comps.forEach(function(c) {
     c.distribute();
   });

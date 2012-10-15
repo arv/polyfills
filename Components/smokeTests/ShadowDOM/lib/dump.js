@@ -66,15 +66,15 @@ dumper = function(n, composedOnly) {
   if (n.baby) {
     n = n.baby;
   }
-  if (n.childNodes.length || n.lightDom || n.doppleganger || n.insertions) {
+  if (n.childNodes.length || n.lightDOM || n.doppleganger || n.insertions) {
     console.group(label);
     if (n.doppleganger) {
       _xdump('DOPPLEGANGER', n.doppleganger.cache);
       console.group('COMPOSED');
     }
-    if ((n.lightDom || n.shadows || n.insertions) && !composedOnly) {
+    if ((n.lightDOM || n.shadows || n.insertions) && !composedOnly) {
       //if (n.changeling) {
-      //  dump(n.lightDom || n);
+      //  dump(n.lightDOM || n);
       //} else {
         xdump(n);
       //}
@@ -105,7 +105,7 @@ _xdump = function(inLabel, inTree) {
 };
 
 xdump = function(inTree) {
-  _xdump('LIGHT', inTree.lightDom);
+  _xdump('LIGHT', inTree.lightDOM);
   /*
   if (inTree.shadows && inTree.shadows.childNodes.length > 1) {
     _xdump('SHADOW-ROOTS', inTree.shadows);
@@ -122,7 +122,7 @@ xdump = function(inTree) {
   // handle exploded tree
   var frag = root.insertions ? {childNodes: root.insertions} : root;
   //
-  if (inTree.lightDom && inTree.lightDom.childNodes.length) {
+  if (inTree.lightDOM && inTree.lightDOM.childNodes.length) {
     _xdump('COMPOSED', frag);
   } else {
     dump(frag);
@@ -147,7 +147,7 @@ var piterator = function(inNodes, inFn) {
 pumperator = function(inLabel, inNode) {
   var node = inNode.baby || inNode;
   //
-  var light = node.lightDom;
+  var light = node.lightDOM;
   light = light && light.childNodes.length && light;
   //
   // local tree is expressed by last shadow (or the node itself)
@@ -209,9 +209,9 @@ lightSump = function(inNode) {
 };
 
 lightSumper = function(inLabel, inNode) {
-  // light (public) tree is either explicit lightDom, or our regular (exploded) 
+  // light (public) tree is either explicit lightDOM, or our regular (exploded) 
   // tree
-  var nodes = (inNode.lightDom && inNode.lightDom.childNodes)
+  var nodes = (inNode.lightDOM && inNode.lightDOM.childNodes)
     || (inNode.insertions || inNode.childNodes);
   sumpNodes(inLabel, nodes, lightSump);
 };

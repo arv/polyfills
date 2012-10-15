@@ -3,7 +3,7 @@
 scope = scope || {};
 
 scope.webkitShadowImpl = {
-  createShadowDom: function(inInstance, inContents) {
+  createShadowDOM: function(inInstance, inContents) {
     var shadowRoot = new WebKitShadowRoot(inInstance);
     // TODO(sjmiles): check spec: .host not set automatically
     if (!shadowRoot.host) {
@@ -13,7 +13,7 @@ scope.webkitShadowImpl = {
     shadowRoot.appendChild(inContents);
     return shadowRoot;
   },
-  installDom: function(inNode) {
+  installDOM: function(inNode) {
   }
 };
 

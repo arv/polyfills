@@ -62,7 +62,7 @@ HTMLElementElement.prototype = {
     this.lifecycleImpl = inLifecycle;
   },
   instantiate: function() {
-    return CustomDomElements.instantiate(this.prototype, this.template,
+    return CustomDOMElements.instantiate(this.prototype, this.template,
       this.lifecycleImpl);
   },
   register: function(element) {
@@ -107,7 +107,7 @@ HTMLElementElement.prototype = {
     //
     // we need to reprocess the prototype (cheating because
     // prototype is not a property defintion object as called for
-    // by the spec; it happens to work now due CustomDomElements is
+    // by the spec; it happens to work now due CustomDOMElements is
     // implemented to take a regular map)
     //
     this.prototype = CustomDOMElements.generatePrototype(this.extendsName,
@@ -247,7 +247,7 @@ var elementUpgrader = {
   go: function() {
     CustomDOMElements.upgradeElements = this._upgradeElements;
     CustomDOMElements.upgradeAll(document);
-    CustomDOMElements.watchDom();
+    CustomDOMElements.watchDOM();
   }
 };
 

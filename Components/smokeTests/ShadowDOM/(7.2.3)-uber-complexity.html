@@ -13,10 +13,10 @@ license that can be found in the LICENSE file.
     <script src="lib/dump.js"></script>
     <script src="lib/Component.js"></script>
     <!-- -->
-    <script src="../../ShadowDOM/polyfill/LightDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/LightDOM.js"></script>
     <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
     <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
     <!-- -->
     <style>
       div, g-A, g-B, g-C {
@@ -42,7 +42,7 @@ license that can be found in the LICENSE file.
         B = c$[1];
         
         B.shadows.firstChild.appendChild(document.createTextNode(" Appended to B's Base "));
-        B.lightDom.appendChild(document.createTextNode(" Appended to B "));
+        B.lightDOM.appendChild(document.createTextNode(" Appended to B "));
         A.distribute();
         
         

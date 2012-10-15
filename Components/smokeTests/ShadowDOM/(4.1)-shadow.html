@@ -14,7 +14,7 @@ license that can be found in the LICENSE file.
     <!-- -->
     <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
     <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
     <!-- -->
     <style>
       div, g-A {
@@ -26,9 +26,9 @@ license that can be found in the LICENSE file.
     </style>
     <script>
       change = function() {
-        new ShadowDom($("g-A"), $("template#Abb").content);
-        new ShadowDom($("g-A"), $("template#Ab").content);
-        new ShadowDom($("g-A"), $("template#A").content);
+        new ShadowDOM($("g-A"), $("template#Abb").content);
+        new ShadowDOM($("g-A"), $("template#Ab").content);
+        new ShadowDOM($("g-A"), $("template#A").content);
         $("g-A").distribute();
         xdump($("g-A"));
       }

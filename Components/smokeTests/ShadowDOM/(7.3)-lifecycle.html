@@ -13,10 +13,10 @@ license that can be found in the LICENSE file.
     <script src="lib/dump.js"></script>
     <script src="lib/Component.js"></script>
     <!-- -->
-    <script src="../../ShadowDOM/polyfill/LightDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/LightDOM.js"></script>
     <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
     <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDom.js"></script>
+    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
     <!-- -->
     <style>
       div, g-A, g-B {
@@ -30,7 +30,7 @@ license that can be found in the LICENSE file.
       change = function() {
         Component.register("g-A", ["A"], {
           created: function() {
-            this.content = ShadowDom.localQuery(this.shadows.lastChild, "content");
+            this.content = ShadowDOM.localQuery(this.shadows.lastChild, "content");
           },
           alter: function() {
             if (this.content.hasAttribute("select") && this.content.attributes.select.value == "#a2") {
