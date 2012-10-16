@@ -9,13 +9,11 @@ license that can be found in the LICENSE file.
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- -->
+    <script>window.__exported_components_polyfill_scope__ = window;</script>
+    <script src="../../ShadowDOM/shadowdom-polyfill.js" shadow="shim"></script>
+    <!-- -->
     <script src="lib/lang.js"></script>
     <script src="lib/dump.js"></script>
-    <!-- -->
-    <script src="../../ShadowDOM/polyfill/LightDOM.js"></script>
-    <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
-    <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
     <!-- -->
     <style>
       div, g-A {
@@ -29,10 +27,9 @@ license that can be found in the LICENSE file.
       change = function() {
         A = $("g-A");
         //
-        new LightDOM(A);
-        new ShadowDOM(A, $("template#Ab").content);
-        new ShadowDOM(A, $("template#A").content);
-        A.distribute();
+        new ShadowRoot(A, $("template#Ab").content);
+        new ShadowRoot(A, $("template#A").content);
+        ShadowDOM.distribute(A);
         //
         dumper(A);
       }

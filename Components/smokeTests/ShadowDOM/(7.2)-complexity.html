@@ -9,14 +9,12 @@ license that can be found in the LICENSE file.
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- -->
+    <script>window.__exported_components_polyfill_scope__ = window;</script>
+    <script src="../../ShadowDOM/shadowdom-polyfill.js" shadow="shim"></script>
+    <!-- -->
     <script src="lib/lang.js"></script>
     <script src="lib/dump.js"></script>
     <script src="lib/Component.js"></script>
-    <!-- -->
-    <script src="../../ShadowDOM/polyfill/LightDOM.js"></script>
-    <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
-    <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
     <!-- -->
     <style>
       div, g-A, g-B {
@@ -52,14 +50,14 @@ license that can be found in the LICENSE file.
       <!-- Base collects #a1's -->
       <template id="Base">[Base->]<content select="#a1"></content>[<-Base]</template>
       
-     <!--  <hr/> -->
+      <hr/> 
       
-      <!-- Expected output (also, see console):
+      Expected output (also, see console):
 
       <div>[A->]
         <div>[B->]<span>Where do I go?</span>[Base->][<-Base][<-B]</div>
         <div>[B->][][Base->]Where Am I?[<-Base][<-B]</div>
-      [<-A]</div> -->
+      [<-A]</div> 
 
 </body>
 </html>

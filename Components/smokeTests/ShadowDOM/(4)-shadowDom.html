@@ -9,12 +9,10 @@ license that can be found in the LICENSE file.
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- -->
+    <script src="../../ShadowDOM/shadowdom-polyfill.js" shadow="shim"></script>
+    <!-- -->
     <script src="lib/lang.js"></script>
     <script src="lib/dump.js"></script>
-    <!-- -->
-    <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
-    <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
     <!-- -->
     <style>
       div, g-A {
@@ -26,8 +24,16 @@ license that can be found in the LICENSE file.
     </style>
     <script>
       change = function() {
-        new ShadowDOM($("g-A"), $("template#A").content);
-        $("g-A").distribute();
+        new ShadowRoot($("g-A"), $("template#A").content, {applyAuthorStyles: true});
+        /*
+        // make ShadowRoot
+        var root = new ShadowDOM.ShadowRoot($("g-A"));
+        // stamp our template
+        root.appendChild($("template#A").content);
+        // distribute new nodes
+        ShadowDOM.distribute($("g-A"));
+        */
+        // log
         xdump($("g-A"));
       }
     </script>

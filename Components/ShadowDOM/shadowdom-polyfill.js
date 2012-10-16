@@ -17,7 +17,7 @@ scope = scope || {};
 
 // directives
 
-var thisFile = "components-polyfill.js";
+var thisFile = "shadowdom-polyfill.js";
 
 var source, base = "";
 
@@ -70,19 +70,13 @@ var require = function(inSrc) {
 };
 
 [
-  "lib/lang.js",
-  "ShadowDOM/webkit/WebkitShadowDOM.js",
-  "ShadowDOM/polyfill/LightDOM.js",
-  "ShadowDOM/polyfill/Changeling.js",
-  "ShadowDOM/polyfill/Projection.js",
-  "ShadowDOM/polyfill/ShimShadowDOM.js",
-  "ShadowDOM/ShadowDOMImpl.js",
-  "ComponentDocuments/path.js",
-  "ComponentDocuments/loader.js",
-  "ComponentDocuments/parser.js",
-  "CustomDOMElement/CustomDOMElements.js",
-  "CustomDOMElement/HTMLElementElement.js",
-  "boot.js"
+  "../lib/lang.js",
+  "webkit/WebkitShadowDOM.js",
+  "polyfill/LightDOM.js",
+  "polyfill/Changeling.js",
+  "polyfill/Projection.js",
+  "polyfill/ShimShadowDOM.js",
+  "ShadowDOMImpl.js"
 ].forEach(require);
 
 })(window.__exported_components_polyfill_scope__);

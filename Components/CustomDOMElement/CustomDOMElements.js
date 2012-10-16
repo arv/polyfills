@@ -10,7 +10,7 @@ scope = scope || {};
 
 // imports
 
-var shadowDOMImpl = scope.shadowDOMImpl;
+var ShadowDOM = scope.ShadowDOM;
 
 // custom element definition registry (name: definition)
 
@@ -74,8 +74,8 @@ var finalize = function(inElement, inDefinition) {
   //
   // do shadow dom distribution (for shims that do this imperatively)
   if (inDefinition.template) {
-    // use polymorphic shadowDOMImpl
-    shadowDOMImpl.installDOM(inElement);
+    // trigger distribution (for ShadowRoot impls that require it)
+    ShadowDOM.distribute(inElement);
     // upgrade custom elements that came from templates
     upgradeAll(inElement);
   }
@@ -122,10 +122,21 @@ var createShadowDOM = function(inElement, inDefinition) {
   if (inDefinition.template) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
-    //
+    // 
+    // ShadowDOM is an import
+    var shadowRoot = new ShadowDOM.ShadowRoot(inElement);
+    // TODO(sjmiles): check spec: .host not set automatically
+    if (!shadowRoot.host) {
+      shadowRoot.host = inElement;
+    }
+    var contents = inDefinition.template.content.cloneNode(true);
+    shadowRoot.appendChild(contents);
+    return shadowRoot;
+    /*
     // use polymorphic shadowDOMImpl
     var shadow = shadowDOMImpl.createShadowDOM(inElement,
       inDefinition.template.content.cloneNode(true));
+    */
   }
   return shadow;
 };
@@ -229,34 +240,6 @@ var generatePrototype = function(inExtends, inProperties) {
   // OUTPUT
   return prototype;
 };
-
-/*
-var transplantNode = function(upgrade, element) {
-  upgrade.model = element.model;
-  forEach(element.attributes, function(a) {
-    upgrade.setAttribute(a.name, a.value);
-    // if there is an mdv attribute binding, add it to the upgraded element
-    if (a.bindingText) {
-      upgrade.addBinding(a.name, a.bindingText);
-    }
-  });
-  var n$ = [];
-  forEach(element.childNodes, function(n) {
-    //if (!isTemplate(n)) {
-      n$.push(n);
-    //}
-  });
-  // TODO(sjmiles): make bug reduction: appending children after creating
-  // shadow DOM seems to result in an unstable node if n$.length == 1 and
-  // n$[0] is a text node
-  forEach(n$, function(n) {
-      //console.log(n);
-      upgrade.appendChild(n);
-  });
-  //
-  element.parentNode.replaceChild(upgrade, element);
-};
-*/
 
 var upgradeElement = function(inElement, inDefinition) {
   // do not re-upgrade
