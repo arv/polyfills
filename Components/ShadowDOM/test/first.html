@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--
+Copyright 2012 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<html>
+  <head>
+    <title>Mocha Test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- -->
+    <script>window.__exported_components_polyfill_scope__ = window;</script>
+    <script src="../shadowdom-polyfill.js"></script>
+    <!-- -->
+    <link rel="stylesheet" href="../../../third_party/mocha/mocha.css" />
+    <!-- -->
+    <style>
+      #test1 > div, #test1 > A {
+        display: block;
+        border: 1px dotted red;
+        margin: 8px;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="../../../third_party/mocha/mocha.js"></script>
+<!--    <script src="chai.js"></script>-->
+    <script>mocha.setup('bdd')</script>
+<!--    <script>expect = chai.expect</script>-->
+<!--    <script src="Array.js">-->
+    <script>
+      $ = document.querySelector.bind(document);
+      testem = function(inImpl, inNode) {
+        // make ShadowRoot
+        var root = new inImpl.ShadowRoot(inNode);
+        // stamp our template
+        root.appendChild($("#test1 > template#A").content.cloneNode(true));
+        // distribute
+        inImpl.distribute(inNode);
+      }
+      tester = function(inImpl, inSlctr) {
+        var n = $(inSlctr).cloneNode(true);
+        $("#test1").appendChild(n);
+        //document.body.appendChild(n);
+        testem(inImpl, n);
+        return n;
+      }
+      describe("some group", function() {
+        describe("some subgroup", function() {
+          var expected = "<span>A's Template</span>";
+          it("tautologies are true", function() {
+             // not throwing is enough?
+          });
+          it("WebKit", function() {
+            var n = tester(WebkitShadowDOM, "#test1 > A");
+            // I can't test anything useful
+          });
+          it("Shim", function() {
+            var actual = tester(ShimShadowDOM, "#test1 > A").innerHTML.trim();
+            if (expected != actual) {
+              var err = new Error('Unexpected output: expected: [' + expected + '] actual: [' + actual + ']');
+              // docs say I get a diff, but I don't
+              err.expected = expected;
+              err.actual = actual;
+              throw err;
+            }
+          });
+        })
+      });
+    </script>
+    <script>
+      mocha.run();
+    </script>
+    <div id="test1">
+      <A>
+        <span>Where am I?</span>
+      </A>
+      <template id="A"><span>A's Template</span></template>
+    </div>
+  </body>
+</html>
