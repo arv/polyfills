@@ -6,11 +6,9 @@ var Component = function(inElement, inDefinition) {
   var elt = inElement;
   // track Components for debugging
   c$.push(elt);
-  // make lightdom
-  new LightDOM(elt);
-  // make shadowdom
+  // make ShadowDOM
   for (var i=0, b; (b=inDefinition.bases[i]); i++) {
-    new ShadowDOM(elt, $("template#" + b).content);
+    new ShadowDOM.ShadowRoot(elt).appendChild($("template#" + b).content);
   }
   // mark it upgraded
   elt.is = inDefinition.name;
@@ -36,10 +34,7 @@ Component.prototype = {
         this.addEventListener(n, fn.bind(this));
       }
     }
-  }/*,
-  distribute: function() {
-    ShadowDOM.distribute(this);
-  }*/
+  }
 };
 
 Component.registry = [];

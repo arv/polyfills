@@ -9,12 +9,10 @@ license that can be found in the LICENSE file.
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- -->
-    <script src="lib/lang.js"></script>
-    <script src="lib/dump.js"></script>
+    <script>window.__exported_components_polyfill_scope__ = window;</script>
+    <script src="../../ShadowDOM/shadowdom-polyfill.js" shadow="shim"></script>
     <!-- -->
-    <script src="../../ShadowDOM/polyfill/Changeling.js"></script>
-    <script src="../../ShadowDOM/polyfill/Projection.js"></script>
-    <script src="../../ShadowDOM/polyfill/ShadowDOM.js"></script>
+    <script src="lib/dump.js"></script>
     <!-- -->
     <style>
       div, g-A {
@@ -26,10 +24,10 @@ license that can be found in the LICENSE file.
     </style>
     <script>
       change = function() {
-        new ShadowDOM($("g-A"), $("template#Abb").content);
-        new ShadowDOM($("g-A"), $("template#Ab").content);
-        new ShadowDOM($("g-A"), $("template#A").content);
-        $("g-A").distribute();
+        new ShadowDOM.ShadowRoot($("g-A")).appendChild($("template#Abb").content.cloneNode(true));
+        new ShadowDOM.ShadowRoot($("g-A")).appendChild($("template#Ab").content.cloneNode(true));
+        new ShadowDOM.ShadowRoot($("g-A")).appendChild($("template#A").content.cloneNode(true));
+        ShadowDOM.distribute($("g-A"));
         xdump($("g-A"));
       }
     </script>

@@ -1,20 +1,30 @@
-var ShadowDOM = function(inNode, inTemplate) {
+(function(scope) {
+
+// imports
+
+var Projection = scope.Projection;
+var LightDOM = scope.LightDOM;
+
+// ShadowRoot constructor
+
+var ShadowRoot = function(inNode) {
+  // ShadowDOM implies LightDOM
+  if (!inNode.lightDOM) {
+    new LightDOM(inNode);
+  }
   // make a new root
   var root = document.createElement("shadow-root");
+  // mutual references
+  root.host = inNode;
+  inNode.shadow = root;
   // get shadows store
   var shadows = inNode.shadows;
   // if there is no store
   if (!shadows) {
     // create shadow store
     shadows = inNode.shadows = document.createDocumentFragment();
-    // add some API to inInstance
-    inNode.distribute = ShadowDOM.distribute;
-  }
-  // stamp our template
-  var shadow = inTemplate && inTemplate.cloneNode(true);
-  // install our shadow nodes
-  if (shadow) {
-    root.appendChild(shadow);
+    // add API to inNode
+    inNode.distribute = distribute;
   }
   // install the root
   shadows.appendChild(root);
@@ -26,16 +36,15 @@ var isInsertionPoint = function(inNode) {
   return (inNode.tagName == "SHADOW" || inNode.tagName == "CONTENT");
 };
 
-(function(){
-  
-ShadowDOM.distribute = function() {
+var distribute = function() {
   var pool = this.lightDOM && this.lightDOM.childNodes;
   var root = this.shadows.lastChild;
   // distribute any lightdom to our shadowDOM(s)
-  distribute(poolify(pool), root);
+  distributePool(poolify(pool), root);
+  // virtualize insertion points
   flatten(root);
   // project composed tree
-  new Projection(this).addNodes(root.childNodes);
+  new Projection(this).addNodes(root.composedNodes || root.childNodes);
 };
   
 // ShadowDOM Query (simplistic)
@@ -86,12 +95,12 @@ var _search = function(inNode, inSlctr) {
     inNode.insertions || inNode.childNodes, inSlctr);
 };
 
-ShadowDOM.localQueryAll = function(inNode, inSlctr) {
+var localQueryAll = function(inNode, inSlctr) {
   return search(inNode.insertions || inNode.childNodes, inSlctr);
 };
 
-ShadowDOM.localQuery = function(inNode, inSlctr) {
-  return ShadowDOM.localQueryAll(inNode, inSlctr)[0];
+var localQuery = function(inNode, inSlctr) {
+  return localQueryAll(inNode, inSlctr)[0];
 };
 
 var poolify = function(inNodes) {
@@ -141,11 +150,11 @@ var decorateInsertionPoint = function(inPoint) {
   }
 };
 
-var distribute = function(inPool, inRoot) {
+var distributePool = function(inPool, inRoot) {
   var root = inRoot;
   //
   // distribute pool to <content> nodes
-  var insertions = ShadowDOM.localQueryAll(root, "content");
+  var insertions = localQueryAll(root, "content");
   insertions.forEach(function(insertion) {
     decorateInsertionPoint(insertion);
     var slctr = insertion.getAttribute("select");
@@ -154,15 +163,15 @@ var distribute = function(inPool, inRoot) {
   });
   //
   // distribute older shadow to <shadow>
-  var shadow = ShadowDOM.localQuery(root, "shadow");
+  var shadow = localQuery(root, "shadow");
   if (shadow) {
     var olderRoot = root.previousSibling;
     new Projection(shadow).addNodes(olderRoot.childNodes);
-    distribute(inPool, olderRoot);
+    distributePool(inPool, olderRoot);
   }
   //
   // distribute any contained objects
-  var comps = ShadowDOM.localQueryAll(root, "~");
+  var comps = localQueryAll(root, "~");
   comps.forEach(function(c) {
     c.distribute();
   });
@@ -186,4 +195,13 @@ var flatten = function(inTree) {
   }
 };
 
-})();
+scope.ShimShadowDOM = {
+  ShadowRoot: ShadowRoot,
+  distribute: function(inNode) {
+    inNode.distribute();
+  },
+  localQueryAll: localQueryAll,
+  localQuery: localQuery
+};
+
+})(window.__exported_components_polyfill_scope__);
