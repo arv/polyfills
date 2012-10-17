@@ -25,7 +25,7 @@ Projection.prototype = {
     if (n.parentNode) {
       new Changeling(n).transplant(n);
     }
-    customAppendChild(this.host, n);
+    appendExplodedChild(this.host, n);
   },
   addNodes: function(inNodes) {
     for (var i=0, n; (n=inNodes[i]); i++) {
@@ -48,21 +48,24 @@ Projection.flatten = function(inNode) {
   for (var i=0, n; (n=inNode.insertions[i]); i++) {
     // always deref
     n = n.baby || n;
-    // if n is a flattenable projection
-    if (n.projection && n.projection.flattenme) {
+    // if n is flattenable
+    if (n.shouldFlatten) {
+      n.shouldFlatten = false;
       // insert n's COMPOSED children
       var nodes = n.composedNodes || n.childNodes;
       for (var j=0, c; (c=nodes[j]); j++) {
         // make sure there is a placeholder for c in the insertion list
         if (!c.baby) {
           new Changeling(c).transplant(c);
+        } else {
+          c = c.baby;
         }
-        // add the node to the composed dom
-        inNode.appendChild(c.baby || c);
+        // add the node to the flattened-composed dom
+        appendFlattenedChild(inNode, c);
       }
     } else {
-      // otherwise, insert n itself
-      inNode.appendChild(n);
+      // otherwise, add n itself to the flattened-composed dom
+      appendFlattenedChild(inNode, n);
     }
   }
 };
@@ -72,24 +75,23 @@ var createInsertions = function(inNode) {
   for (var i=0, n; (n=inNode.childNodes[i]); i++) {
     i$.push(new Changeling(n));
   }
-  // alter inNode's API
-  inNode.composedNodes = inNode.childNodes;
-  Object.defineProperty(inNode, 'childNodes', {
-    get: function() {
-      return this.insertions || this.composedNodes;
-    }
-  });
 };
 
-var customAppendChild = function(inNode, inChild) {
+// add to the 'exploded composed' tree
+var appendExplodedChild = function(inNode, inChild) {
   if (inNode.insertions) {
     inNode.insertions.push(inChild);
   } else {
-    inNode.appendChild(inChild);
+    // equivalent to appendChild, but avoids any appendChild override
+    inNode.insertBefore(inChild, null);
   }
-  return inChild;
 };
 
+// add to the 'flattened composed' tree
+var appendFlattenedChild = function(inNode, inChild) {
+  // equivalent to appendChild, but avoids any appendChild override
+  inNode.insertBefore(inChild, null);
+};
 
 scope.Projection = Projection;
 
