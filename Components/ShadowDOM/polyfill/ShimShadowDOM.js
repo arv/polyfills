@@ -46,12 +46,12 @@ var distribute = function() {
   // project composed tree
   new Projection(this).addNodes(root.composedNodes || root.childNodes);
 };
-  
+
 // ShadowDOM Query (simplistic)
 
 // custom selectors:
 //
-// ~        = any node with lightDOM 
+// ~        = any node with lightDOM
 // #<id>    = node with id = <id>
 // *        = any non-Text node
 // .<class> = any node with <class> in it's classList
@@ -60,7 +60,7 @@ var distribute = function() {
 var matches = function(inNode, inSlctr) {
   if (inSlctr == "~") {
     return Boolean(inNode.lightDOM);
-  } 
+  }
   if (inSlctr[0] == '#') {
     return inNode.id == inSlctr.slice(1);
   }
@@ -91,7 +91,7 @@ var search = function(inNodes, inSlctr) {
 };
 
 var _search = function(inNode, inSlctr) {
-  return search((inNode.lightDOM && inNode.lightDOM.childNodes) || 
+  return search((inNode.lightDOM && inNode.lightDOM.childNodes) ||
     inNode.insertions || inNode.childNodes, inSlctr);
 };
 
@@ -178,14 +178,14 @@ var distributePool = function(inPool, inRoot) {
 };
 
 var flatten = function(inTree) {
-  var nodes = inTree.insertions || inTree.childNodes;
+  var nodes = inTree.insertions || inTree.composedNodes || inTree.childNodes;
   if (nodes) {
     var hasInsertion = false;
     for (var i=0, n; (n=nodes[i]); i++) {
       n = n.baby || n;
       flatten(n);
-      if (isInsertionPoint(n) && n.projection) {
-        n.projection.flattenme = true;
+      if (isInsertionPoint(n)) {
+        n.shouldFlatten = true;
         hasInsertion = true;
       }
     }
