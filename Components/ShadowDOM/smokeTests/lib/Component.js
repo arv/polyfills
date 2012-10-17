@@ -8,7 +8,7 @@ var Component = function(inElement, inDefinition) {
   c$.push(elt);
   // make ShadowDOM
   for (var i=0, b; (b=inDefinition.bases[i]); i++) {
-    new ShadowDOM.ShadowRoot(elt).appendChild($("template#" + b).content);
+    new ShadowRoot(elt, $("template#" + b).content);
   }
   // mark it upgraded
   elt.is = inDefinition.name;
