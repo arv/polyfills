@@ -6,7 +6,7 @@ var ShadowRoot = function(inNode, inContent, inFlags) {
   // make ShadowRoot
   var root = new ShadowDOM.ShadowRoot(inNode);
   // stamp our template
-  root.appendChild(inContent);
+  root.appendChild(inContent.cloneNode(true));
   // distribute new nodes
   ShadowDOM.distribute(inNode);
   // apply flags
