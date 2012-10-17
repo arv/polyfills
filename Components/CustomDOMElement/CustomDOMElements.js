@@ -132,11 +132,6 @@ var createShadowDOM = function(inElement, inDefinition) {
     var contents = inDefinition.template.content.cloneNode(true);
     shadowRoot.appendChild(contents);
     return shadowRoot;
-    /*
-    // use polymorphic shadowDOMImpl
-    var shadow = shadowDOMImpl.createShadowDOM(inElement,
-      inDefinition.template.content.cloneNode(true));
-    */
   }
   return shadow;
 };
