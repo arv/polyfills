@@ -75,6 +75,13 @@ var createInsertions = function(inNode) {
   for (var i=0, n; (n=inNode.childNodes[i]); i++) {
     i$.push(new Changeling(n));
   }
+  // modify API so appendChild sends input directly into insertion list
+  // *unless* this object also has LightDOM, then LightDOM wins
+  if (!inNode.lightDOM) {
+    inNode.appendChild = function(inChild) {
+      this.insertions.push(inChild);
+    };
+  }
 };
 
 // add to the 'exploded composed' tree
