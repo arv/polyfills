@@ -8,7 +8,8 @@ var Component = function(inElement, inDefinition) {
   c$.push(elt);
   // make ShadowDOM
   for (var i=0, b; (b=inDefinition.bases[i]); i++) {
-    new ShadowRoot(elt, $("template#" + b).content);
+    var root = new ShadowRoot(elt, $("template#" + b).content);
+    Component.upgradeAll(root);
   }
   // mark it upgraded
   elt.is = inDefinition.name;
@@ -64,6 +65,7 @@ Component.upgradeAll = function(inNode) {
 Component.upgradeName = function(inNode, inDefinition) {
   var nodes = inNode.querySelectorAll(inDefinition.name);
   Array.prototype.forEach.call(nodes, function(n) {
+    n = n.baby || n;
     if (!n.is) {
       new Component(n, inDefinition);
     }
