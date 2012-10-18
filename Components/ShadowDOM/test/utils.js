@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2012 The Toolkitchen Authors. All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
@@ -16,32 +16,51 @@ render = function(inCode) {
   $("#work").innerHTML = extractHtml(inCode);
 };
 
-makeRoot = function(inName, inTemplateName, inImpl) {
-  var node = $("#work > " + inName);
+
+var ShadowRoot = function(inNameOrNode, inTemplateName) {
+  // resolve a node
+  var node = typeof inNameOrNode == "string" ?
+    $("#work > " + inNameOrNode) : inNameOrNode;
   // make ShadowRoot
-  var root = new inImpl.ShadowRoot(node);
+  var root = new ShadowDOM.ShadowRoot(node);
   // stamp content
-  root.appendChild($("#work > template#" + inTemplateName).content.cloneNode(true));
+  root.appendChild(
+    $("#work > template#" + inTemplateName).content.cloneNode(true));
   // distribute
-  inImpl.distribute(node);
-  //
+  ShadowDOM.distribute(node);
   return root;
 };
 
 testImpls = function(inTest, inExpected) {
   it("WebKit", function() {
-    inTest(WebkitShadowDOM);
+    ShadowDOM = WebkitShadowDOM;
+    inTest();
     // I can't test anything useful
   });
   it("Shim", function() {
-    var root = inTest(ShimShadowDOM);
-    var actual = root.host.innerHTML.trim().replace(/[\n]/g, '');
+    ShadowDOM = ShimShadowDOM;
+    var actual = inTest();
     if (inExpected != actual) {
-      var err = new Error('Unexpected output: expected: [' + inExpected + '] actual: [' + actual + ']');
+      console.group("failure");
+      console.log("actual:");
+      console.log(actual);
+      console.log("expected:");
+      console.log(inExpected);
+      console.groupEnd();
+      var err = new Error('Unexpected output: expected: [' +
+        inExpected + '] actual: [' + actual + ']');
       // docs say I get a diff, but I don't
       err.expected = inExpected;
       err.actual = actual;
       throw err;
     }
   });
+};
+
+actualContent = function(inNode) {
+  return inNode.innerHTML.trim().replace(/[\n]/g, '');
+};
+
+actualOuterContent = function(inNode) {
+  return inNode.outerHTML.trim().replace(/[\n]/g, '');
 };
