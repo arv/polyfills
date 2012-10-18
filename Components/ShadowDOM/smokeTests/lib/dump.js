@@ -57,9 +57,8 @@ dumper = function(n) {
   }
   // deref changeling
   n = n.baby || n;
-  if (n.childNodes.length) { // || n.lightDOM || n.shadow || n.insertions) {
+  if (n.childNodes.length) {
     console.group(label);
-    //if (n.lightDOM || n.shadow || n.insertions) {
     if (n.shadow) {
       xdump(n);
     } else {
