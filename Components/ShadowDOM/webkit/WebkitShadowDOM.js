@@ -4,6 +4,7 @@ scope.WebkitShadowDOM = {
   ShadowRoot: function(inElement) {
     var root = new WebKitShadowRoot(inElement);
     inElement.shadow = root;
+    root.host = inElement;
     return root;
   },
   distribute: function() {},

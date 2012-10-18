@@ -1,6 +1,6 @@
 (function(){
 
-var test = function(inImpl) {
+var test = function() {
   render(function(){/*
       <A>
         <span>Where am I?</span>
@@ -10,10 +10,11 @@ var test = function(inImpl) {
       <template id="Ab"><span>A's Base Template:<shadow></shadow></span></template>
       <template id="A"><span>A's Template:<shadow></shadow></span></template>
   */});
-  // make ShadowRoot
-  makeRoot("A", "Abb", inImpl)
-  makeRoot("A", "Ab", inImpl)
-  return makeRoot("A", "A", inImpl)
+  new ShadowRoot("A", "Abb");
+  new ShadowRoot("A", "Ab");
+  var root = new ShadowRoot("A", "A");
+  return actualContent(root.host);
+
 };
 
 describe("(4.1)-shadow", function() {

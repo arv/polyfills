@@ -1,6 +1,6 @@
 (function(){
 
-var test = function(inImpl) {
+var test = function() {
   render(function(){/*
       <A>
         <span>Where am I?</span>
@@ -9,8 +9,8 @@ var test = function(inImpl) {
         <span>A's Template</span>
       </template>
   */});
-  // make ShadowRoot
-  return makeRoot("A", "A", inImpl)
+  var root = new ShadowRoot("A", "A")
+  return actualContent(root.host);
 };
 
 describe("(4)-shadowDOM", function() {
