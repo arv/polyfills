@@ -108,7 +108,6 @@ var poolify = function(inNodes) {
   //
   var pool = [];
   for (var i=0, n; (n=base[i]) && (n=n.baby || n); i++) {
-    //if (n.tagName == "CONTENT") {
     if (isInsertionPoint(n)) {
       base.splice(i--, 1);
       pool = pool.concat(poolify(n.insertions || n.childNodes));
@@ -166,7 +165,9 @@ var distributePool = function(inPool, inRoot) {
   var shadow = localQuery(root, "shadow");
   if (shadow) {
     var olderRoot = root.previousSibling;
-    new Projection(shadow).addNodes(olderRoot.childNodes);
+    // we want to project exploded tree
+    new Projection(shadow).addNodes(olderRoot.insertions 
+      || olderRoot.childNodes);
     distributePool(inPool, olderRoot);
   }
   //
