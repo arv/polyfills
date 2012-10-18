@@ -65,6 +65,7 @@ Component.upgradeAll = function(inNode) {
 Component.upgradeName = function(inNode, inDefinition) {
   var nodes = inNode.querySelectorAll(inDefinition.name);
   Array.prototype.forEach.call(nodes, function(n) {
+    n = n.baby || n;
     if (!n.is) {
       new Component(n, inDefinition);
     }
