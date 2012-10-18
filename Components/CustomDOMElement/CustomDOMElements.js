@@ -253,7 +253,7 @@ var upgradeElement = function(inElement, inDefinition) {
   // TODO(sjmiles): OFFSPEC: it's more convenient for 
   // polyfill to upgrade in-place, instead of creating
   // a new element.
-  upgrade = inElement;
+  var upgrade = inElement;
   initialize(upgrade, inDefinition);
   //
   // complete element setup (compute redistributions)
