@@ -82,7 +82,7 @@ var require = function(inSrc) {
   "ComponentDocuments/parser.js",
   "CustomDOMElement/CustomDOMElements.js",
   "CustomDOMElement/HTMLElementElement.js",
-  "boot.js"
+  "lib/boot.js"
 ].forEach(require);
 
 })(window.__exported_components_polyfill_scope__);
