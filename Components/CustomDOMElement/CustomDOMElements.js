@@ -241,7 +241,7 @@ var upgradeElement = function(inElement, inDefinition) {
   if (inElement && inElement.__upgraded__) {
      return inElement;
   }
-  console.log('upgrading', inElement);
+  //console.log('upgrading', inElement);
   // 5.b.2.3. Let UPGRADE be the result of running custom element
   // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
   /*
