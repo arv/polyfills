@@ -5,6 +5,10 @@ scope.WebkitShadowDOM = {
     var root = new WebKitShadowRoot(inElement);
     inElement.shadow = root;
     root.host = inElement;
+    // TODO(sjmiles): enabled by default so that @host polyfills will
+    // work under composition. Can remove when @host is implemented
+    // natively.
+    root.applyAuthorStyles = true;
     return root;
   },
   distribute: function() {},

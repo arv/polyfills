@@ -65,19 +65,19 @@ var finalize = function(inElement, inDefinition) {
   //
   // walk the chain to create shadows
   chain.forEach(function(definition) {
-    // create shadow dom, cache the root
-    shadows.push(createShadowDOM(inElement, definition));
+    // create shadow dom
+    var root = createShadowDOM(inElement, definition)
+    // cache the root
+    shadows.push(root);
+    // upgrade elements now so that references created
+    // during distribution do not become stale.
+    upgradeAll(root);
   });
-  // upgrade elements before doing shadow dom so that any references created
-  // during distribution do not become stale.
-  upgradeAll(inElement);
   //
   // do shadow dom distribution (for shims that do this imperatively)
   if (inDefinition.template) {
     // trigger distribution (for ShadowRoot impls that require it)
     ShadowDOM.distribute(inElement);
-    // upgrade custom elements that came from templates
-    upgradeAll(inElement);
   }
   //
   // TODO(sjmiles): OFF SPEC:
@@ -241,6 +241,7 @@ var upgradeElement = function(inElement, inDefinition) {
   if (inElement && inElement.__upgraded__) {
      return inElement;
   }
+  //console.log('upgrading', inElement);
   // 5.b.2.3. Let UPGRADE be the result of running custom element
   // instantiation algorithm with PROTOTYPE and TEMPLATE as arguments
   /*
