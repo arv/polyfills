@@ -3,8 +3,9 @@
 var test = function(inImpl) {
   render(function(){/*
     <g-A><span id="a1">Where am I?</span></g-A>
-
-    <template id="A">[A->][<content></content>][<-A]</template>
+  
+    <template id="A">[A->]<g-B><content></content></g-B>[<-A]</template>
+    <template id="B">[B->][<content></content>][<-B]</template>
   */});
   //
   Component.reset();
@@ -13,6 +14,7 @@ var test = function(inImpl) {
       this.style.color = 'orange';
     }
   });
+  Component.register('g-B', ['B']);
   Component.upgradeAll($('#work'));
   //
   var A = c$[0];
@@ -20,8 +22,8 @@ var test = function(inImpl) {
   return actualOuterContent(A);
 };
 
-describe('(7)-component', function() {
-  var expected = '<g-a is="g-A" style="color: orange;">[A-&gt;][<span id="a1">Where am I?</span>][&lt;-A]</g-a>';
+describe('(7.1)-composition', function() {
+  var expected = '<g-a is="g-A" style="color: orange;">[A-&gt;]<g-b is="g-B">[B-&gt;][<span id="a1">Where am I?</span>][&lt;-B]</g-b>[&lt;-A]</g-a>';
   testImpls(test, expected);
 });
 
