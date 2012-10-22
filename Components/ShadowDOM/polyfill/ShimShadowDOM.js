@@ -36,17 +36,6 @@ var isInsertionPoint = function(inNode) {
   return (inNode.tagName == "SHADOW" || inNode.tagName == "CONTENT");
 };
 
-var distribute = function() {
-  var pool = this.lightDOM && this.lightDOM.childNodes;
-  var root = this.shadows.lastChild;
-  // distribute any lightdom to our shadowDOM(s)
-  distributePool(poolify(pool), root);
-  // virtualize insertion points
-  flatten(root);
-  // project composed tree
-  new Projection(this).addNodes(root.composedNodes || root.childNodes);
-};
-
 // ShadowDOM Query (simplistic)
 
 // custom selectors:
@@ -103,10 +92,11 @@ var localQuery = function(inNode, inSlctr) {
   return localQueryAll(inNode, inSlctr)[0];
 };
 
+// distribution
+
 var poolify = function(inNodes) {
-  var base = inNodes ? Array.prototype.slice.call(inNodes, 0) : [];
-  //
   var pool = [];
+  var base = inNodes ? Array.prototype.slice.call(inNodes, 0) : [];
   for (var i=0, n; (n=base[i]) && (n=n.baby || n); i++) {
     if (isInsertionPoint(n)) {
       base.splice(i--, 1);
@@ -115,7 +105,6 @@ var poolify = function(inNodes) {
       pool.push(n);
     }
   }
-  //
   return pool;
 };
 
@@ -140,7 +129,7 @@ var decorateInsertionPoint = function(inPoint) {
     Object.defineProperty(inPoint, 'distributedNodes', {
       get: function() {
         var items = [];
-        for (var i=0, n$ = this.childNodes, n; (n=n$[i]); i++) {
+        for (var i=0, n$=this.childNodes, n; (n=n$[i]); i++) {
           items.push(n.baby || n);
         }
         return items;
@@ -149,11 +138,20 @@ var decorateInsertionPoint = function(inPoint) {
   }
 };
 
+var distribute = function() {
+  var root = this.shadows.lastChild;
+  var pool = poolify(this.lightDOM && this.lightDOM.childNodes);
+  // distribute any lightdom to our shadowDOM(s)
+  distributePool(pool, root);
+  // virtualize insertion points
+  flatten(root);
+  // project composed tree
+  new Projection(this).addNodes(root.composedNodes || root.childNodes);
+};
+
 var distributePool = function(inPool, inRoot) {
-  var root = inRoot;
-  //
   // distribute pool to <content> nodes
-  var insertions = localQueryAll(root, "content");
+  var insertions = localQueryAll(inRoot, "content");
   insertions.forEach(function(insertion) {
     decorateInsertionPoint(insertion);
     var slctr = insertion.getAttribute("select");
@@ -162,17 +160,17 @@ var distributePool = function(inPool, inRoot) {
   });
   //
   // distribute older shadow to <shadow>
-  var shadow = localQuery(root, "shadow");
+  var shadow = localQuery(inRoot, "shadow");
   if (shadow) {
-    var olderRoot = root.previousSibling;
-    // we want to project exploded tree
+    var olderRoot = inRoot.previousSibling;
+    // project the EXPLODED root-tree into <shadow>
     new Projection(shadow).addNodes(olderRoot.insertions 
       || olderRoot.childNodes);
     distributePool(inPool, olderRoot);
   }
   //
   // distribute any contained objects
-  var comps = localQueryAll(root, "~");
+  var comps = localQueryAll(inRoot, "~");
   comps.forEach(function(c) {
     c.distribute();
   });
