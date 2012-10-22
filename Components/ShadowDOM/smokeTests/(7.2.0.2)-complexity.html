@@ -27,7 +27,7 @@ license that can be found in the LICENSE file.
       change = function() {
         Component.register("g-A", ["Base", "A"]);
         Component.register("g-B", ["Base", "B"]);
-        Component.register("g-C", ["Base", "C"]);
+        Component.register("g-C", ["B", "C"]);
         Component.upgradeAll();
         //
         A = c$[0];

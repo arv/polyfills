@@ -13,7 +13,7 @@ var test = function(inImpl) {
   Component.reset();
   Component.register('g-A', ['Base', 'A']);
   Component.register('g-B', ['Base', 'B']);
-  Component.register('g-C', ['Base', 'C']);
+  Component.register('g-C', ['B', 'C']);
   Component.upgradeAll($('#work'));
   //
   var A = c$[0];
