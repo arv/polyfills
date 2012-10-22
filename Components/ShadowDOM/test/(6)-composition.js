@@ -11,13 +11,13 @@ var test = function() {
     <br/>[<-A]</template>
     <template id="B">[B->][<content></content>][<-B]</template>
   */});
-  var root = new ShadowRoot("g-A", "A");
-  new ShadowRoot(ShadowDOM.localQuery(root, "g-B"), "B")
-  return actualContent(root.host);
+  var root = new ShadowRoot('g-A', 'A');
+  new ShadowRoot(ShadowDOM.localQuery(root, 'g-B'), 'B')
+  return actualOuterContent(root.host);
 };
 
-describe("(6)-composition", function() {
-  var expected = '[A-&gt;]<br>        a B:        <g-b>[B-&gt;][Content For B][&lt;-B]</g-b>        A\'s content: [<span id="a1">Where am I?</span>]    <br>[&lt;-A]';
+describe('(6)-composition', function() {
+  var expected = '<g-a>[A-&gt;]<br>        a B:        <g-b>[B-&gt;][Content For B][&lt;-B]</g-b>        A\'s content: [<span id="a1">Where am I?</span>]    <br>[&lt;-A]</g-a>';
   testImpls(test, expected);
 });
 
