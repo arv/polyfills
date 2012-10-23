@@ -26,7 +26,10 @@ var path = {
     while ((p = n.parentNode)) {
       n = p;
     }
-    return (n && (n.URL || n.name)) || "";
+    var url = (n && (n.URL || n.name)) || "";
+    // take only the left side if there is a #
+    url = url.split("#")[0];
+    return url;
   },
   resolveUrl: function(inBaseUrl, inUrl) {
     if (this.isAbsUrl(inUrl)) {
