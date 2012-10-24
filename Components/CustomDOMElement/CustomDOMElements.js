@@ -66,12 +66,14 @@ var finalize = function(inElement, inDefinition) {
   // walk the chain to create shadows
   chain.forEach(function(definition) {
     // create shadow dom
-    var root = createShadowDOM(inElement, definition)
-    // cache the root
-    shadows.push(root);
-    // upgrade elements now so that references created
-    // during distribution do not become stale.
-    upgradeAll(root);
+    var root = createShadowDOM(inElement, definition);
+    if (root) {
+      // cache the root
+      shadows.push(root);
+      // upgrade elements now so that references created
+      // during distribution do not become stale.
+      upgradeAll(root);
+    }
   });
   //
   // do shadow dom distribution (for shims that do this imperatively)
@@ -122,7 +124,7 @@ var createShadowDOM = function(inElement, inDefinition) {
   if (inDefinition.template) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
     // 4.a.3.2. clone template as contents of this shadow root
-    // 
+    //
     // ShadowDOM is an import
     var shadowRoot = new ShadowDOM.ShadowRoot(inElement);
     // TODO(sjmiles): check spec: .host not set automatically
@@ -131,9 +133,8 @@ var createShadowDOM = function(inElement, inDefinition) {
     }
     var contents = inDefinition.template.content.cloneNode(true);
     shadowRoot.appendChild(contents);
-    return shadowRoot;
   }
-  return shadow;
+  return shadowRoot;
 };
 
 var observeAttributeChanges = function(inElement, inDefinition) {
@@ -251,7 +252,7 @@ var upgradeElement = function(inElement, inDefinition) {
     transplantNode(upgrade, inElement);
   }
   */
-  // TODO(sjmiles): OFFSPEC: it's more convenient for 
+  // TODO(sjmiles): OFFSPEC: it's more convenient for
   // polyfill to upgrade in-place, instead of creating
   // a new element.
   var upgrade = inElement;

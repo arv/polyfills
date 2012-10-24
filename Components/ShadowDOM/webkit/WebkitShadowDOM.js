@@ -3,6 +3,9 @@
 scope.WebkitShadowDOM = {
   ShadowRoot: function(inElement) {
     var root = new WebKitShadowRoot(inElement);
+    // TODO(sjmiles): .shadow, .host, .olderSubtree are supposed to be native,
+    // at least for public ShadowDOMs
+    root.olderShadow = inElement.shadow;
     inElement.shadow = root;
     root.host = inElement;
     // TODO(sjmiles): enabled by default so that @host polyfills will

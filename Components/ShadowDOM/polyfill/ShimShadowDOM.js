@@ -14,6 +14,8 @@ var ShadowRoot = function(inNode) {
   }
   // make a new root
   var root = document.createElement("shadow-root");
+  // chain shadows
+  root.olderSubtree = inNode.shadow;
   // mutual references
   root.host = inNode;
   inNode.shadow = root;
