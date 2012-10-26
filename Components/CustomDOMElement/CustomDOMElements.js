@@ -68,8 +68,6 @@ var finalize = function(inElement, inDefinition) {
     // create shadow dom
     var root = createShadowDOM(inElement, definition);
     if (root) {
-      // TODO(sjmiles): MDV hack: regression from earlier versions
-      root.model = inElement.model;
       // cache the root
       shadows.push(root);
       // upgrade elements now so that references created
