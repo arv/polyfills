@@ -128,15 +128,13 @@ var extract = function(inPool, inSlctr) {
 var decorateInsertionPoint = function(inPoint) {
   if (!inPoint.__decorated__) {
     inPoint.__decorated__ = true;
-    Object.defineProperty(inPoint, 'distributedNodes', {
-      get: function() {
-        var items = [];
-        for (var i=0, n$=this.childNodes, n; (n=n$[i]); i++) {
-          items.push(n.baby || n);
-        }
-        return items;
+    inPoint.getDistributedNodes = function() {
+      var items = [];
+      for (var i=0, n$=this.childNodes, n; (n=n$[i]); i++) {
+        items.push(n.baby || n);
       }
-    });
+      return items;
+    };
   }
 };
 
