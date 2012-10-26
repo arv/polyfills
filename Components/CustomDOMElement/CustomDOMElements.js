@@ -68,6 +68,8 @@ var finalize = function(inElement, inDefinition) {
     // create shadow dom
     var root = createShadowDOM(inElement, definition);
     if (root) {
+      // TODO(sjmiles): MDV hack: regression from earlier versions
+      root.model = inElement.model;
       // cache the root
       shadows.push(root);
       // upgrade elements now so that references created
@@ -120,6 +122,18 @@ var getAncestorChain = function(inDefinition) {
   return chain;
 };
 
+// TODO(sjmiles): special cloneNode required for nodes that
+// might contain <template> tags
+var cloneNodeWithTemplates = function(inNode) {
+  var clone = inNode.cloneNode(true);
+  var sourceTemplates = inNode.querySelectorAll('template');
+  var targetTemplates = clone.querySelectorAll('template');
+  for (var i = 0; i < sourceTemplates.length; i++) {
+    targetTemplates[i].content = sourceTemplates[i].content
+  }
+  return clone;
+};
+
 var createShadowDOM = function(inElement, inDefinition) {
   if (inDefinition.template) {
     // 4.a.3.1 create a shadow root with ELEMENT as it's host
@@ -131,7 +145,8 @@ var createShadowDOM = function(inElement, inDefinition) {
     if (!shadowRoot.host) {
       shadowRoot.host = inElement;
     }
-    var contents = inDefinition.template.content.cloneNode(true);
+    var contents = cloneNodeWithTemplates(inDefinition.template.content);
+    //var contents = inDefinition.template.content.cloneNode(true);
     shadowRoot.appendChild(contents);
   }
   return shadowRoot;
