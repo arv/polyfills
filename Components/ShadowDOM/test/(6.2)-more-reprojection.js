@@ -13,7 +13,7 @@ var test = function() {
   var br = new ShadowRoot(ShadowDOM.localQuery(root, 'g-B'), 'B');
   var cr = new ShadowRoot(ShadowDOM.localQuery(br, 'g-C'), 'C');
   new ShadowRoot(ShadowDOM.localQuery(cr, 'g-D'), 'D');
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(6.2)-more-reprojection', function() {

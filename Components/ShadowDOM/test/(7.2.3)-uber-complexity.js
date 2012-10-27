@@ -48,12 +48,12 @@ var test = function(inImpl) {
   var A = c$[0];
   ShadowDOM.distribute(A);
   //
-  return actualOuterContent(A);
+  return A;
 };
 
 describe('(7.2.3)-uber-complexity', function() {
   var expected = '<g-a is="g-A">[A-&gt;]<g-c is="g-C">[C-&gt;]<span>[Cb-&gt;][Cbb-&gt;]<g-d is="g-D">[D-&gt;][Db-&gt;]<g-e is="g-E">[E-&gt;]<g-f is="g-F">[F-&gt;][Eb-&gt;]<g-f is="g-F">[F-&gt;][Dbb-&gt;]<g-e is="g-E">[E-&gt;]<g-f is="g-F">[F-&gt;][Eb-&gt;]<g-f is="g-F">[F-&gt;][Dbbb-&gt;]<g-e is="g-E">[E-&gt;]<g-f is="g-F">[F-&gt;][Eb-&gt;]<g-f is="g-F">[F-&gt;]<g-b is="g-B">[B-&gt;][<span>Where am I?</span>][Base-&gt;][&lt;-Base][&lt;-B]</g-b>[&lt;-F]</g-f>[&lt;-Eb][&lt;-F]</g-f>[&lt;-E]</g-e>[&lt;-Dbbb][&lt;-F]</g-f>[&lt;-Eb][&lt;-F]</g-f>[&lt;-E]</g-e>[&lt;-Dbb][&lt;-F]</g-f>[&lt;-Eb][&lt;-F]</g-f>[&lt;-E]</g-e>[&lt;-Db][&lt;-D]</g-d>[&lt;-Cbb][&lt;-Cb]</span>[&lt;-C]</g-c>      <g-b is="g-B">[B-&gt;][ Appended to B ][Base-&gt;][&lt;-Base] Appended to B\'s Base [&lt;-B]</g-b><g-c is="g-C">[C-&gt;]<span>[Cb-&gt;][Cbb-&gt;]<g-d is="g-D">[D-&gt;][Db-&gt;]<g-e is="g-E">[E-&gt;]<g-f is="g-F">[F-&gt;][Eb-&gt;]<g-f is="g-F">[F-&gt;][Dbb-&gt;]<g-e is="g-E">[E-&gt;]<g-f is="g-F">[F-&gt;][Eb-&gt;]<g-f is="g-F">[F-&gt;][Dbbb-&gt;]<g-e is="g-E">[E-&gt;]<g-f is="g-F">[F-&gt;][Eb-&gt;]<g-f is="g-F">[F-&gt;]<g-b is="g-B">[B-&gt;][[Base-&gt;][&lt;-Base]][Base-&gt;][&lt;-Base][&lt;-B]</g-b>[&lt;-F]</g-f>[&lt;-Eb][&lt;-F]</g-f>[&lt;-E]</g-e>[&lt;-Dbbb][&lt;-F]</g-f>[&lt;-Eb][&lt;-F]</g-f>[&lt;-E]</g-e>[&lt;-Dbb][&lt;-F]</g-f>[&lt;-Eb][&lt;-F]</g-f>[&lt;-E]</g-e>[&lt;-Db][&lt;-D]</g-d>[&lt;-Cbb][&lt;-Cb]</span>[&lt;-C]</g-c>[&lt;-A]    </g-a>';
-  testImpls(test, expected);
+  testImpls(test, expected, true);
 });
 
 })();

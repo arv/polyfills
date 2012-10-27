@@ -15,12 +15,12 @@ var test = function(inImpl) {
   Component.upgradeAll($('#work'));
   //
   var A = c$[0];
-  return actualOuterContent(A);
+  return A;
 };
 
 describe('(7.2.0.1)-complexity', function() {
   var expected = '<g-a is="g-A">[A-&gt;]<g-b is="g-B">[B-&gt;][<span id="a2">Where do I go?</span>][Base-&gt;]<span id="a1">Where am I?</span>[&lt;-Base][&lt;-B]</g-b><g-b is="g-B">[B-&gt;][][Base-&gt;][Base-&gt;][&lt;-Base][&lt;-Base][&lt;-B]</g-b>[&lt;-A]</g-a>';
-  testImpls(test, expected);
+  testImpls(test, expected, true);
 });
 
 })();

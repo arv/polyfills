@@ -14,12 +14,12 @@ var test = function() {
   new ShadowRoot('g-A', 'Ab');
   var root = new ShadowRoot('g-A', 'A');
   new ShadowRoot(ShadowDOM.localQuery(root, 'g-B'), 'B');
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(6.4)-reproject-shadow-select', function() {
   var expected = '<g-a>[A-&gt;]<span id="a2">I like to be first</span><g-b>[B-&gt;]<span id="a1">Where am I?</span>[&lt;-B]</g-b>[&lt;-A]</g-a>';
-  testImpls(test, expected);
+  testImpls(test, expected, true);
 });
 
 })();

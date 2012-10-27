@@ -9,7 +9,7 @@ var test = function() {
   */});
   // make ShadowRoot
   var root = new ShadowRoot('g-A', 'A');
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(5.1.2)-content-select-all', function() {

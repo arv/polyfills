@@ -33,7 +33,7 @@ var test = function() {
   changeContent();
   addContent();
   //
-  return actualOuterContent(host);
+  return host;
 };
 
 describe('(5.1.3)-content-select-dynamic', function() {
