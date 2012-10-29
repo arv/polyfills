@@ -26,7 +26,7 @@ var test = function(inImpl) {
   //
   var A = c$[0];
   A.alter();
-  return actualOuterContent(A);
+  return A;
 };
 
 describe('(7.3)-lifecycle', function() {

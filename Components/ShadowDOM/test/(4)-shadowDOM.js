@@ -10,11 +10,11 @@ var test = function() {
       </template>
   */});
   var root = new ShadowRoot('A', 'A')
-  return actualContent(root.host);
+  return root.host;
 };
 
 describe('(4)-shadowDOM', function() {
-  var expected = '<span>A\'s Template</span>';
+  var expected = '<a>        <span>A\'s Template</span>      </a>';
   testImpls(test, expected);
 });
 

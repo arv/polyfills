@@ -14,12 +14,13 @@ var test = function() {
   new ShadowRoot('g-A', 'Ab');
   var root = new ShadowRoot('g-A', 'A');
   new ShadowRoot(ShadowDOM.localQuery(root, 'g-B'), 'B');
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(6.3)-reproject-shadow', function() {
   var expected = '<g-a>[A-&gt;]<g-b>[B-&gt;][Ab-&gt;]<span id="a1">Where am I?</span>[&lt;-Ab][&lt;-B]</g-b>[&lt;-A]</g-a>';
-  testImpls(test, expected);
+  // skip WebkitShadowDOM since shadow reprojection is not supported yet
+  testImpls(test, expected, true);
 });
 
 })();
