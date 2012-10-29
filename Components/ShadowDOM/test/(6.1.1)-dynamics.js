@@ -15,7 +15,7 @@ var test = function() {
   host.appendChild(document.createTextNode()).textContent = 'TEXT!!';
   ShadowDOM.distribute(host);
   //
-  return actualOuterContent(host);
+  return host;
 };
 
 describe('(6.1.1)-dynamics', function() {

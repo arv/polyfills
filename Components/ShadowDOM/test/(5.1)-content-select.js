@@ -15,7 +15,7 @@ var test = function() {
   */});
   // make ShadowRoot
   var root = new ShadowRoot('A', 'A');
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(5.1)-content-select', function() {

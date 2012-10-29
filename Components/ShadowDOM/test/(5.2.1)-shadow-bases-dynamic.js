@@ -22,7 +22,7 @@ var test = function() {
   //
   addShadow();
   //
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(5.2)-shadow-bases', function() {

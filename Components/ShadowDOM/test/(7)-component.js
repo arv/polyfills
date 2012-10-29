@@ -17,7 +17,7 @@ var test = function(inImpl) {
   //
   var A = c$[0];
   A.orangify();
-  return actualOuterContent(A);
+  return A;
 };
 
 describe('(7)-component', function() {

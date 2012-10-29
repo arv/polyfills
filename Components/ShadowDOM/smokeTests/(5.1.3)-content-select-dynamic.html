@@ -27,11 +27,11 @@ license that can be found in the LICENSE file.
         A = $("g-A");
         //
         Aroot = new ShadowRoot(A, $("template#A").content);
-        A.distribute();
+        ShadowDOM.distribute(A);
 
         changeContent = function() {
           ShadowDOM.localQuery(Aroot, 'content').setAttribute('select', 'span');
-          A.distribute();
+          ShadowDOM.distribute(A);
         }
 
         addContent = function() {
@@ -39,7 +39,7 @@ license that can be found in the LICENSE file.
           content.setAttribute('select', 'div');
           var div = ShadowDOM.localQuery(Aroot, 'div');
           div.appendChild(content);
-          A.distribute();
+          ShadowDOM.distribute(A);
         }
         changeContent();
         addContent();

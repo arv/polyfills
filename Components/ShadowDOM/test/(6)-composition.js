@@ -13,7 +13,7 @@ var test = function() {
   */});
   var root = new ShadowRoot('g-A', 'A');
   new ShadowRoot(ShadowDOM.localQuery(root, 'g-B'), 'B')
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(6)-composition', function() {

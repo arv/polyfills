@@ -38,12 +38,12 @@ var test = function(inImpl) {
   A.appendChild(n);
   //
   ShadowDOM.distribute(A);
-  return actualOuterContent(A);
+  return A;
 };
 
 describe('(7.2.2)-more-complexity-dynamic', function() {
   var expected = '<g-a is="g-A">[A-&gt;]<g-c is="g-C">[C-&gt;]<span>[Cb-&gt;][Cbb-&gt;]<g-b is="g-B">[B-&gt;][<span id="a2">Where do I go?</span><div id="a2">A2 too</div>][Base-&gt;][&lt;-Base][&lt;-B]</g-b>[&lt;-Cbb][&lt;-Cb]</span>[&lt;-C]</g-c><g-c is="g-C">[C-&gt;]<span>[Cb-&gt;][Cbb-&gt;]<g-b is="g-B">[B-&gt;][][Base-&gt;]<span id="a1">Where am I?</span><div id="a1">A1 dynamic</div>[&lt;-Base][&lt;-B]</g-b>[&lt;-Cbb][&lt;-Cb]</span>[&lt;-C]</g-c>[&lt;-A]</g-a>';
-  testImpls(test, expected);
+  testImpls(test, expected, true);
 });
 
 })();

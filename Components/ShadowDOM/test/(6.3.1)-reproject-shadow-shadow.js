@@ -17,12 +17,12 @@ var test = function() {
   var root = new ShadowRoot('g-A', 'A');
   new ShadowRoot(ShadowDOM.localQuery(root, 'g-B'), 'Bb');
   new ShadowRoot(ShadowDOM.localQuery(root, 'g-B'), 'B');
-  return actualOuterContent(root.host);
+  return root.host;
 };
 
 describe('(6.3.1)-reproject-shadow-shadow', function() {
   var expected = '<g-a>[A-&gt;]<g-b>[B-&gt;][Bb-&gt;][Ab-&gt;]<span id="a1">Where am I?</span>[&lt;-Ab][&lt;-Bb][&lt;-B]</g-b>[&lt;-A]</g-a>';
-  testImpls(test, expected);
+  testImpls(test, expected, true);
 });
 
 })();
