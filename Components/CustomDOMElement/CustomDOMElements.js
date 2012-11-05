@@ -67,11 +67,13 @@ var finalize = function(inElement, inDefinition) {
   chain.forEach(function(definition) {
     // create shadow dom
     var root = createShadowDOM(inElement, definition);
+    // cache the root
+    shadows.push(root);
     if (root) {
-      // TODO(sjmiles): MDV hack: regression from earlier versions
-      root.model = inElement.model;
-      // cache the root
-      shadows.push(root);
+      // polyfill UA parsing by instantiating any new custom elements
+      // reported by MutationObservers. Each root is self-contained,
+      // and so we must set up an observer for each one.
+      watchDOM(root);
       // upgrade elements now so that references created
       // during distribution do not become stale.
       upgradeAll(root);
@@ -309,15 +311,15 @@ var	upgradeAll = function(inNode) {
 
 // polyfill UA parsing HTML by watching dom for changes via mutations observer
 // and upgrading if any are detected.
-var watchDOM = function() {
+var watchDOM = function(inNode) {
   var observer = new WebKitMutationObserver(function(mutations) {
 		mutations.forEach(function(mxn){
 			if (mxn.addedNodes.length) {
-				upgradeAll(document);
+				upgradeAll(inNode);
 			}
     });
   });
-  observer.observe(document.body, {childList: true, subtree: true});
+  observer.observe(inNode, {childList: true, subtree: true});
 }
 
 // SECTION 7.1
