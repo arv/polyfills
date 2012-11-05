@@ -26,7 +26,7 @@ var context;
 var inject = function(inScript, inContext, inName, inSourceUrl) {
   context = inContext;
   // inject a (debuggable!) script tag
-  var	tag = document.createElement("script");
+  var   tag = document.createElement("script");
   tag.textContent = "componentScript('" 
     + inName 
     + "', function(){"
@@ -253,7 +253,7 @@ var elementUpgrader = {
   go: function() {
     CustomDOMElements.upgradeElements = this._upgradeElements;
     CustomDOMElements.upgradeAll(document);
-    CustomDOMElements.watchDOM();
+    CustomDOMElements.watchDOM(document);
   }
 };
 
