@@ -26,7 +26,7 @@ var context;
 var inject = function(inScript, inContext, inName, inSourceUrl) {
   context = inContext;
   // inject a (debuggable!) script tag
-  var   tag = document.createElement("script");
+  var tag = document.createElement("script");
   tag.textContent = "componentScript('" 
     + inName 
     + "', function(){"
