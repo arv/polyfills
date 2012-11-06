@@ -40,6 +40,10 @@ var initialize = function(inElement, inDefinition) {
 var finalize = function(inElement, inDefinition) {
   // flag to prevent re-upgrades
   inElement.__upgraded__ = true;
+  // TODO(sorvell): OFF SPEC: include path so that resources may
+  // be loaded relative to definition location
+  // e.g. this.src = this.__path__ + '/images/foo.png'
+  inElement.__path__ = inDefinition.path || '';
   // TODO(sjmiles): OFF SPEC: attach 'is' attribute and property
   inElement.setAttribute("is", inDefinition.name);
   inElement.is = inDefinition.name;
