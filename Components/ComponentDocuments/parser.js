@@ -42,6 +42,9 @@ var parser = {
       log && console.group(id);
       this.parsed[id] = true;
       this.parseExternalScripts(inDocument);
+      // TODO(sjmiles): it's improper to simply parse linked documents
+      // ahead of parsing elements; one may depend on the other
+      // and the order in the document should have importance
       this.parseLinkedDocuments(inDocument);
       this.parseElements(inDocument);
       log && console.groupEnd();
