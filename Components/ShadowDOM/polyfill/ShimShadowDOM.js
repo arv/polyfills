@@ -165,10 +165,12 @@ var distributePool = function(inPool, inRoot) {
   var shadow = localQuery(inRoot, "shadow");
   if (shadow) {
     var olderRoot = inRoot.previousSibling;
-    // project the EXPLODED root-tree into <shadow>
-    new Projection(shadow).addNodes(olderRoot.insertions 
-      || olderRoot.childNodes);
-    distributePool(inPool, olderRoot);
+    if (olderRoot) {
+      // project the EXPLODED root-tree into <shadow>
+      new Projection(shadow).addNodes(olderRoot.insertions 
+        || olderRoot.childNodes);
+      distributePool(inPool, olderRoot);
+    }
   }
   //
   // distribute any contained objects
