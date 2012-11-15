@@ -1,6 +1,6 @@
 (function(){
 
-var test = function(inImpl) {
+var test = function() {
   render(function(){/*
     <g-A><span id="a1">Where am I?</span><span id="a2">Where do I go?</span></g-A>
 
