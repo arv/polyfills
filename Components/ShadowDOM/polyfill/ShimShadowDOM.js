@@ -139,9 +139,11 @@ var decorateInsertionPoint = function(inPoint) {
 };
 
 var distribute = function() {
+  // primary shadow root
   var root = this.shadows.lastChild;
+  // content pool from lightDOM
   var pool = poolify(this.lightDOM && this.lightDOM.childNodes);
-  // distribute any lightdom to our shadowDOM(s)
+  // distribute any lightDOM to our shadowDOM(s)
   distributePool(pool, root);
   // virtualize insertion points
   flatten(root);
