@@ -110,7 +110,26 @@ var xinspect;
       var k = composedGroups.indexOf(p.local);
       if (k > 0) {
         // apply different color to composed tree
-        p.classList[gs[0] == p.local ? 'add' : 'remove']('composed-' + k%6)
+        var b = gs[0] == p.local;
+        p.classList[b ? 'add' : 'remove']('composed-' + k%6);
+        // only show the composed tree
+        if (p.oldp) {
+          p.oldp.insertBefore(p, p.olds);
+          p.oldp = null;
+          p.olds = null;
+          groups[0].lastElementChild.hidden = false;
+        }
+        if (b) {
+          oldp = p.parentNode;
+          olds = p.nextElementSibling;
+          p.oldp = oldp;
+          p.olds = olds;
+          groups[0].appendChild(p);
+          Array.prototype.forEach.call(groups[0].children, function(n) {
+            n.hidden = true;
+          });
+          p.hidden = false;
+        }
       }
     }
   }
