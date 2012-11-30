@@ -7,7 +7,9 @@ var Changeling = function(inNode) {
   elt.textContent = '(changeling for ' + (node.tagName || "TEXT") + ')';
   elt.__proto__ = Changeling.prototype;
   elt.baby = node;
-  node.changeling = elt;
+  // TODO(sjmiles): dubious, a node can be in N trees 
+  // only track the first transposition
+  node.changeling = node.changeling || elt;
   return elt;
 };
 

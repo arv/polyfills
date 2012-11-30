@@ -198,6 +198,8 @@ var flatten = function(inTree) {
   }
 };
 
+// exports
+
 scope.ShimShadowDOM = {
   ShadowRoot: ShadowRoot,
   distribute: function(inNode) {

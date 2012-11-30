@@ -3,6 +3,10 @@
 var LightDOM = function(inNode) {
   // store lightDOM as a document fragment
   inNode.lightDOM = document.createDocumentFragment();
+  // back-reference host
+  inNode.lightDOM.host = inNode;
+  // identify this fragment as lightDOM
+  inNode.lightDOM.lightDOM = true;
   // move our children into the fragment
   moveChildren(inNode, inNode.lightDOM);
   // alter inNode's API
