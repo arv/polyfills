@@ -73,6 +73,7 @@ HTMLElementElement.prototype = {
   register: function(element) {
     // fix css paths for inline style elements
     elementParser.adjustTemplateCssPaths(element, this.template);
+    elementParser.adjustTemplateAttrPaths(element, this.template);
     // load component stylesheets
     elementParser.sheets(element, this.template);
     // ensure all style tags are scoped.
@@ -127,6 +128,7 @@ HTMLElementElement.prototype = {
     //
     var definition = {
       name: this.name,
+      path: elementParser.calcElementPath(element),
       prototype: this.prototype,
       template: this.template,
       lifecycle: this.lifecycleImpl || {}
@@ -140,6 +142,9 @@ HTMLElementElement.prototype = {
     }
   }
 };
+
+var URL_ATTRS = ['href', 'src', 'action'];
+var URL_ATTRS_SELECTOR = '[' + URL_ATTRS.join('],[') + ']';
 
 var elementParser = {
   parse: function(element) {
@@ -170,7 +175,33 @@ var elementParser = {
     if (template) {
       var docUrl = path.documentUrlFromNode(element);
       forEach($$(template.content, "style"), function(s) {
-        s.innerHTML = path.makeCssUrlsRelative(s.innerHTML, docUrl);
+        s.textContent = this.makeCssUrlsRelative(s.textContent, docUrl);
+      }.bind(this));
+    }
+  },
+  makeCssUrlsRelative: function(inCssText, inBaseUrl) {
+    return inCssText.replace(/url\([^)]*\)/g, function(inMatch) {
+      // find the url path, ignore quotes in url string
+      var urlPath = inMatch.replace(/["']/g, "").slice(4, -1);
+      urlPath = path.resolveUrl(inBaseUrl, urlPath);
+      urlPath = path.makeRelPath(document.URL, urlPath);
+      return "url(" + urlPath + ")";
+    });
+  },
+  calcElementPath: function(element) {
+    var docUrl = path.documentUrlFromNode(element);
+    return path.makeRelPath(document.URL, path.urlToPath(docUrl));
+  },
+  adjustTemplateAttrPaths: function(element, template) {
+    if (template) {
+      var docUrl = path.documentUrlFromNode(element);
+      forEach($$(template.content, URL_ATTRS_SELECTOR), function(n) {
+        URL_ATTRS.forEach(function(v) {
+          var attr = n.attributes[v];
+          if (attr && attr.value) {
+            attr.value = path.resolveUrl(docUrl, attr.value);
+          }
+        })
       });
     }
   },
@@ -180,9 +211,9 @@ var elementParser = {
       //console.group("sheets");
       forEach($$(element, "link[rel=stylesheet]"), function(s) {
         var styles = componentLoader.fetch(s);
-        styles = path.makeCssUrlsRelative(styles, path.nodeUrl(s));
+        styles = this.makeCssUrlsRelative(styles, path.nodeUrl(s));
         sheet.push(styles);
-      });
+      }.bind(this));
       if (sheet.length) {
         //console.log("sheets found (", sheet.length, "), injecting");
         var style = document.createElement("style");

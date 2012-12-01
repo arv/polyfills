@@ -46,15 +46,6 @@ var path = {
   isAbsUrl: function(inUrl) {
     return /^data:/.test(inUrl) || /^http[s]?:/.test(inUrl);
   },
-  makeCssUrlsRelative: function(inCss, inBaseUrl) {
-    return inCss.replace(/url\([^)]*\)/g, function(inMatch) {
-      // find the url path, ignore quotes in url string
-      var urlPath = inMatch.replace(/["']/g, "").slice(4, -1);
-      urlPath = path.resolveUrl(inBaseUrl, urlPath);
-      urlPath = path.makeRelPath(document.URL, urlPath);
-      return "url(" + urlPath + ")";
-    });
-  },
   // make a relative path from source to target
   makeRelPath: function(inSource, inTarget) {
     var s, t;
