@@ -26,7 +26,7 @@ var path = {
     while ((p = n.parentNode)) {
       n = p;
     }
-    var url = (n && (n.URL || n.name)) || "";
+    var url = (n && (n.name || n.URL)) || "";
     // take only the left side if there is a #
     url = url.split("#")[0];
     return url;

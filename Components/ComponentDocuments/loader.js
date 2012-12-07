@@ -41,7 +41,7 @@ var xhr = {
 };
 
 var makeDocument = function(inHTML, inName) {
-  var doc = document.implementation.createHTMLDocument();
+  var doc = document.implementation.createHTMLDocument('component');
   doc.body.innerHTML = inHTML;
   doc.name = inName;
   return doc;
