@@ -259,9 +259,10 @@ var generatePrototype = function(inExtends, inProperties) {
 };
 
 var upgradeElement = function(inElement, inDefinition) {
+  var upgrade = inElement;
   // do not re-upgrade
-  if (inElement && inElement.__upgraded__) {
-     return inElement;
+  if (upgrade && upgrade.__upgraded__) {
+     return upgrade;
   }
   //console.log('upgrading', inElement);
   // 5.b.2.3. Let UPGRADE be the result of running custom element
@@ -276,7 +277,7 @@ var upgradeElement = function(inElement, inDefinition) {
   // TODO(sjmiles): OFFSPEC: it's more convenient for
   // polyfill to upgrade in-place, instead of creating
   // a new element.
-  var upgrade = inElement;
+  
   initialize(upgrade, inDefinition);
   //
   // complete element setup (compute redistributions)
@@ -294,7 +295,7 @@ var upgradeElements = function(inTree, inDefinition) {
   // 6.b.1 Let NAME be the custom element name part of DEFINITION
   var name = inDefinition.name;
   // 6.b.2 For each element ELEMENT in TREE whose custom element name is NAME:
-  var elements = inTree.querySelectorAll(name);
+  var elements = ShadowDOM.localQueryAll(inTree, name);
   for (var i=0, element; element=elements[i]; i++) {
     // when an element is upgraded, its children are upgraded. This makes
     // stale elements in this list that are children of components. Avoid
@@ -315,8 +316,10 @@ var	upgradeAll = function(inNode) {
 
 // polyfill UA parsing HTML by watching dom for changes via mutations observer
 // and upgrading if any are detected.
+var MO = window.MutationObserver || window.WebKitMutationObserver;
+
 var watchDOM = function(inNode) {
-  var observer = new WebKitMutationObserver(function(mutations) {
+  var observer = new MO(function(mutations) {
 		mutations.forEach(function(mxn){
 			if (mxn.addedNodes.length) {
 				upgradeAll(inNode);
