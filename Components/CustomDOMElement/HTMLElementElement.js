@@ -145,6 +145,7 @@ HTMLElementElement.prototype = {
 
 var URL_ATTRS = ['href', 'src', 'action'];
 var URL_ATTRS_SELECTOR = '[' + URL_ATTRS.join('],[') + ']';
+var URL_TEMPLATE_SEARCH = '{{.*}}';
 
 var elementParser = {
   parse: function(element) {
@@ -198,7 +199,7 @@ var elementParser = {
       forEach($$(template.content, URL_ATTRS_SELECTOR), function(n) {
         URL_ATTRS.forEach(function(v) {
           var attr = n.attributes[v];
-          if (attr && attr.value) {
+          if (attr && attr.value && (attr.value.search(URL_TEMPLATE_SEARCH) < 0)) {
             attr.value = path.resolveUrl(docUrl, attr.value);
           }
         })

@@ -8,14 +8,6 @@
 
 scope = scope || {};
 
-// NOTE: use attributes on the script tag for this file as directives
-
-// export="[name]"		exports polyfill scope into window as 'name'
-// shimShadow         use shim version of ShadowDOM (otherwise native)
-
-// NOTE: uses 'window' and 'document' globals
-
-// directives
 
 var thisFile = "shadowdom-polyfill.js";
 
@@ -35,48 +27,76 @@ var source, base = "";
   };
 })();
 
-// acquire flags from script tag attributes
-
-var flags = {};
-for (var i=0, a; (a = source.attributes[i]); i++) {
-  flags[a.name] = a.value || true;
-}
-
-// acquire flags from url
-
-if (!flags.noOpts) {
-  var opts = location.search.slice(1).split('&');
-  for (var i=0, o; (o = opts[i]); i++) {
-    o = o.split('=');
-    flags[o[0]] = o[1] || true;
+// if needed, acquire flags
+if (!scope.flags) {
+  var flags = {};
+  // acquire flags from script tag attributes
+  for (var i=0, a; (a = source.attributes[i]); i++) {
+    flags[a.name] = a.value || true;
   }
+
+  // acquire flags from url
+  if (!flags.noOpts) {
+    var opts = location.search.slice(1).split('&');
+    for (var i=0, o; (o = opts[i]); i++) {
+      o = o.split('=');
+      flags[o[0]] = o[1] || true;
+    }
+  }
+
+  console.log(flags);
+
+  // support exportas directive
+  if (flags.exportas) {
+    window[flags.exportas] = scope;
+  }
+  window.__exported_components_polyfill_scope__ = scope;
+
+  scope.flags = flags;
 }
 
-console.log(flags);
-
-// support exportas directive
-
-if (flags.exportas) {
-  window[flags.exportas] = scope;
+if (!scope.flags.shadow) {
+  scope.flags.shadow = window.WebKitShadowRoot ? 'webkit' : 'shim';
 }
-window.__exported_components_polyfill_scope__ = scope;
-
-// module exports
-
-scope.flags = flags;
 
 var require = function(inSrc) {
   document.write('<script src="' + base + inSrc + '"></script>');
 };
 
-[
-  "../lib/lang.js",
-  "webkit/WebkitShadowDOM.js",
-  "polyfill/LightDOM.js",
-  "polyfill/Changeling.js",
-  "polyfill/Projection.js",
-  "polyfill/ShimShadowDOM.js",
-  "ShadowDOMImpl.js"
-].forEach(require);
+var fileSets = {
+  webkit: [
+    'webkit/WebkitShadowDOM.js',
+    'ShadowDOMImpl.js'
+  ],
+  shim: [
+    'polyfill/LightDOM.js',
+    'polyfill/Changeling.js',
+    'polyfill/Projection.js',
+    'polyfill/ShimShadowDOM.js',
+    'ShadowDOMImpl.js'
+  ],
+  // load both webkit and shim
+  testing: [
+    "../lib/lang.js",
+    'webkit/WebkitShadowDOM.js',
+    'polyfill/LightDOM.js',
+    'polyfill/Changeling.js',
+    'polyfill/Projection.js',
+    'polyfill/ShimShadowDOM.js',
+    'ShadowDOMImpl.js'
+  ],
+  polyfill: [
+    '../../ShadowDOM/map.js',
+    '../../ShadowDOM/sidetable.js',
+    '../../ShadowDOM/domreflectionutils.js',
+    '../../ShadowDOM/domoverrides.js',
+    '../../ShadowDOM/paralleltrees.js',
+    '../../ShadowDOM/ShadowRoot.js',
+    'jsshadow/JsShadowDOM.js',
+    'ShadowDOMImpl.js'
+  ]
+}
+
+fileSets[scope.flags.shadow].forEach(require);
 
 })(window.__exported_components_polyfill_scope__);

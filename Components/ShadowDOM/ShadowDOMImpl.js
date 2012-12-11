@@ -2,10 +2,21 @@
 
 scope.flags = scope.flags || {};
 
-var shim = (!window.WebKitShadowRoot || (scope.flags.shadow == "shim") || 
-  (scope.flags.shimshadow));
+scope.flags.shadow = scope.flags.shadow || 
+  (window.WebKitShadowRoot ? 'webkit' : 'shim');
 
-window.ShadowDOM = scope.ShadowDOM = 
-  shim ? scope.ShimShadowDOM : scope.WebkitShadowDOM;
+function fetchShadowImpl(inName) {
+  switch (inName) {
+    case 'webkit':
+      return scope.WebkitShadowDOM;
+    case 'polyfill':
+      return scope.JsShadowDOM;
+    case 'shim':
+    default:
+      return scope.ShimShadowDOM;
+  }
+}
+
+window.ShadowDOM = scope.ShadowDOM = fetchShadowImpl(scope.flags.shadow);
 
 })(window.__exported_components_polyfill_scope__);

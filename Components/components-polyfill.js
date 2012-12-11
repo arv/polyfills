@@ -71,12 +71,7 @@ var require = function(inSrc) {
 
 [
   "lib/lang.js",
-  "ShadowDOM/webkit/WebkitShadowDOM.js",
-  "ShadowDOM/polyfill/LightDOM.js",
-  "ShadowDOM/polyfill/Changeling.js",
-  "ShadowDOM/polyfill/Projection.js",
-  "ShadowDOM/polyfill/ShimShadowDOM.js",
-  "ShadowDOM/ShadowDOMImpl.js",
+  "ShadowDOM/shadowdom-polyfill.js",
   "ComponentDocuments/path.js",
   "ComponentDocuments/loader.js",
   "ComponentDocuments/parser.js",
