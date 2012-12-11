@@ -3,7 +3,7 @@
 scope.flags = scope.flags || {};
 
 scope.flags.shadow = scope.flags.shadow || 
-  (window.WebKitShadowRoot ? 'native' : 'shim');
+  (window.WebKitShadowRoot ? 'webkit' : 'shim');
 
 function fetchShadowImpl(inName) {
   switch (inName) {
