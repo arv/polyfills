@@ -10,6 +10,8 @@ scope = scope || {};
 
 // imports
 
+var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
 var ShadowDOM = scope.ShadowDOM;
 
 // custom element definition registry (name: definition)
@@ -166,8 +168,8 @@ var observeAttributeChanges = function(inElement, inDefinition) {
   // the definition chain to find change handlers.
   //
   var lc = inDefinition.lifecycle;
-  if (lc.attributeChanged && window.WebKitMutationObserver){
-    var observer = new WebKitMutationObserver(function(mutations) {
+  if (lc.attributeChanged && MutationObserver){
+    var observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(m) {
         lc.attributeChanged.call(inElement, m.attributeName,
           m.oldValue, m.target.getAttribute(m.attributeName));
@@ -316,17 +318,17 @@ var	upgradeAll = function(inNode) {
 
 // polyfill UA parsing HTML by watching dom for changes via mutations observer
 // and upgrading if any are detected.
-var MO = window.MutationObserver || window.WebKitMutationObserver;
-
 var watchDOM = function(inNode) {
-  var observer = new MO(function(mutations) {
-		mutations.forEach(function(mxn){
-			if (mxn.addedNodes.length) {
-				upgradeAll(inNode);
-			}
+  if (MutationObserver) {
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mxn){
+        if (mxn.addedNodes.length) {
+          upgradeAll(inNode);
+        }
+      });
     });
-  });
-  observer.observe(inNode, {childList: true, subtree: true});
+    observer.observe(inNode, {childList: true, subtree: true});
+  }
 }
 
 // SECTION 7.1
