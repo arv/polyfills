@@ -2,7 +2,7 @@
 
 scope.JsShadowDOM = {
   ShadowRoot: function(inElement) {
-    var root = new JsShadowRoot(inElement);
+    var root = inElement.jsCreateShadowRoot();
     root.olderSubtree = inElement.shadow;
     inElement.shadow = root;
     root.host = inElement;
